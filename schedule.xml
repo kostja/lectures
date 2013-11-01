@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE book [
+]>
+
+<book xmlns="http://docbook.org/ns/docbook" version="5.0"
+      xmlns:xi="http://www.w3.org/2001/XInclude" 
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+      xml:id="nosql-schedule">
+<title>Программа лекций по курсу СУБД, Технопарк Mail.Ru, 2014 г.</title>
+
+<para>
+Курс лекций раздёлён на 3 части, в конце каждой части
+проводится колоквиум.
+</para>
+
+<bridgehead>
+Основы
+</bridgehead>
+
+<orderedlist>
+
+<listitem>
+    Вводная лекция. Роль СУБД в разработке приложений. Цель курса.
+</listitem>
+
+<listitem>
+    История развития СУБД. Сетевые, иерархические, реляционные, 
+    объектные, XML СУБД. Движение NoSQL.
+</listitem>
+
+<listitem>
+    Реляционная модель данных. Реляционная алгебра. Нормальные
+    формы и нормализация.
+</listitem>
+
+<listitem>
+    Понятие транзакции. ACID. Понятие консистентности данных.  
+    Модели консистентности данных.
+</listitem>
+
+<listitem>
+    Структуры данных и алгоритмы для двухуровневой памяти.
+</listitem>
+
+<listitem>
+    Конкурентный доступ к данным. Пессимистичные
+    блокировки и многоверсионное управление блокировками. 2PL
+    теорема.
+</listitem>
+
+</orderedlist>
+<bridgehead>
+    Масштабирование и высокая доступность
+</bridgehead>
+
+<orderedlist>
+<listitem>
+    Модели данных в NoSQL.
+</listitem>
+
+<listitem>
+    Модели консистентности распределённых СУБД. CAP теорема.
+    Протокол 2PC.
+</listitem>
+
+<listitem>
+   Очереди, принципы и приёмы обработки очередей.
+</listitem>
+
+<listitem>
+    Репликация. Разрешение конфликтов. Векторное время.
+</listitem>
+
+<listitem>
+    Консистентность распределённого ДКА. Paxos и Raft.
+</listitem>
+
+<listitem>
+   Понятие сбоя и принципы восстановления после сбоя. 
+   Оценка надёжности системы: MTTR и MTBF.
+   Протокол Gossip.
+</listitem>
+
+<listitem>
+    Автоматизация роста распределённой системы. 
+    Принцип эластичности. Шрадинг. Консистентное хэширование.
+</listitem>
+
+</orderedlist>
+<bridgehead>
+    Дополнительные главы
+</bridgehead>
+<orderedlist>
+<listitem>
+    Эволюция способов доступа к данным.
+    Pro/C. HANDLER API. ORM. ActiveRecord.
+</listitem>
+
+<listitem>
+    Оптимизация SQL запросов. Основные шаги.
+</listitem>
+
+<listitem>
+    Выполнение реляционного соединения.
+    Поиск оптимального плана выполнения соединения (JOIN). 
+</listitem>
+
+<listitem>
+    Методы доступа к данным при выполнении запроса.
+    HASH-соединения. BITSET индексы. Фильтры Блюма.
+</listitem>
+
+<listitem>
+   Распределение данных, влияние статистики распределения на
+   выбор оптимального плана выполнения запроса.
+</listitem>
+
+<listitem>
+    Явление Big Data. Map/Reduce.
+</listitem>
+
+<listitem>
+    Колоночные хранилища. Clickview, Infobright.
+</listitem>
+
+<listitem>
+    XML СУБД. Графовые СУБД.
+</listitem>
+</orderedlist>
+
+<bibliography>
+    <biblioentry>
+        <title>Principles of Transaction Processing, Second Edition</title>
+        <author><personname>Philip A. Bernstein, Eric Newcomer</personname></author>
+    </biblioentry>
+
+    <biblioentry>
+        <title> Database systems, the complete book </title>
+        <author><personname>Hector Garcia-Molina, Jeffrey D. Ullman,
+            Jennifer Widom</personname></author>
+    </biblioentry>
+
+    <biblioentry>
+        <title>Transactional Information Systems: Theory,
+        Algorithms, and the Practice of Concurrency Control and
+        Recovery </title>
+       <author><personname>Gerhard Weikum, Gottfried Vossen</personname></author>
+    </biblioentry>
+    
+    <biblioentry>
+        <author><personname>Justin Sheehy, David Smith</personname></author>
+        <title>Bitcask A Log-Structured Hash Table for Fast Key/Value Data</title>
+    </biblioentry>
+
+    <biblioentry>
+        <author><personname>Patrick O'Neil , Edward Cheng, Dieter Gawlick, Elizabeth O'Neil</personname></author>
+        <title>The Log-Structured Merge-Tree (LSM-Tree)</title>
+    </biblioentry>
+
+    <biblioentry>
+        <author><personname>Harald Prokop</personname></author>
+        <title>Cache-Oblivious Algorithms</title>
+    </biblioentry>
+
+    <biblioentry>
+        <author><personname>Michael A. Bender, Bradley C. Kuszmaul</personname></author>
+        <title>Data Structures and Algorithms for Big Databases</title>
+    </biblioentry>
+
+    <biblioentry>
+        <author><personname>Michael A. Bender Martin Farach-Colton Jeremy T. Fineman</personname></author>
+        <title>Cache-Oblivious Streaming B-trees </title>
+    </biblioentry>
+
+    <biblioentry>
+        <author><personname>Burton H. Bloom</personname></author>
+        <title>Space/time trade-offs in hash coding with allowable errors
+        </title>
+    </biblioentry>
+
+    <biblioentry>
+        <author><personname>Leslie Lamport</personname></author>
+        <title>Time, clock and ordering of events in distributed systems</title>
+    </biblioentry>
+
+    <biblioentry>
+        <author><personname>Leslie Lamport</personname></author>
+        <title>Paxos Made Simple</title>
+    </biblioentry>
+
+    <biblioentry>
+        <author><personname>C.A.R. Hoare</personname></author>
+        <title>Communicating Sequential Processes</title>
+    </biblioentry>
+
+    <biblioentry>
+        <author><personname>Jim Gray, Pat Helland, Patrick O’Neil, Dennis Shasha
+        </personname></author>
+        <title>The Dangers of Replication and a Solution</title>
+    </biblioentry>
+
+    <biblioentry>
+        <author><personname>Parisa Jalili Marandi</personname></author>
+        <title>Multi-ring paxos </title>
+    </biblioentry>
+    <biblioentry>
+        <author><personname>Leslie Lamport, Robert Shostak, Marshall Pease</personname></author>
+        <title>The Byzantine Generals Problem</title>
+    </biblioentry>
+
+    <biblioentry>
+        <author><personname>Colin J. Fidge</personname></author>
+        <title>Timestamps in Message-Passing Systems That Preserve the Partial Ordering</title>
+    </biblioentry>
+
+    <biblioentry>
+        <author><personname>Ken Birman</personname></author>
+        <title>A History of the Virtual Synchrony Replication Model</title>
+    </biblioentry>
+
+    <biblioentry>
+        <author><personname>Jim Gray, Pat Helland, Patrick O’Neil, Dennis Shasha</personname></author>
+        <title>The Dangers of Replication and a Solution</title>
+    </biblioentry>
+
+
+    <biblioentry>
+        <author><personname>Diego Ongaro, John Ousterhout</personname></author>
+        <title>In Search of an Understandable Consensus Algorithm</title>
+    </biblioentry>
+
+    <biblioentry>
+        <author><personname>Jun Rao, Eugene J. Shekita, Sandeep Tata</personname></author>
+        <title>Using Paxos to Build a Scalable, Consistent,
+and Highly Available Datastore</title>
+    </biblioentry>
+
+    <biblioentry>
+        <author><personname>Indranil Gupta Tushar D. Chandra German S.
+        Goldszmidt</personname></author>
+        <title>On Scalable and Efficient Distributed Failure Detectors</title>
+    </biblioentry>
+
+    <biblioentry>
+        <author><personname>David Karger Eric Lehman Matthew Levine Tom
+            Leighton Rina Panigrahy Daniel Lewin</personname></author>
+        <title>Consistent Hashing and Random Trees: Distributed Caching Protocols for Relieving Hot Spots on the World Wide Web</title>
+    </biblioentry>
+
+    <biblioentry>
+        <author><personname>Michael Stonebraker, Samuel Madden, Daniel J.
+            Abadi, Stavros Harizopoulos, Nabil Hachem, Pat Helland</personname></author>
+        <title>The End of an Architectural Era (It’s Time for a
+        Complete Rewrite)
+        </title>
+    </biblioentry>
+
+    <biblioentry>
+        <author><personname>
+    James C. Corbett, Jeffrey Dean, Michael Epstein, Andrew Fikes,
+    Christopher Frost, JJ Furman, Sanjay Ghemawat, Andrey Gubarev,
+    Christopher Heiser, Peter Hochschild, Wilson Hsieh, Sebastian
+    Kanthak, Eugene Kogan, Hongyi Li, Alexander Lloyd, Sergey
+    Melnik, David Mwaura, David Nagle, Sean Quinlan, Rajesh Rao,
+    Lindsay Rolig, Yasushi Saito, Michal Szymaniak, Christopher
+    Taylor, Ruth Wang, Dale Woodford
+        </personname></author>
+        <title>Spanner: Google’s Globally-Distributed Database</title>
+    </biblioentry>
+
+    <biblioentry>
+        <author><personname>Christof Strauch</personname></author>
+        <title>NoSQL Databases</title>
+    </biblioentry>
+
+    <biblioentry>
+        <author><personname>André Allavena, Alan Demers, John E. Hopcroft</personname></author>
+        <title>Correctness of a Gossip Based Membership Protocol</title>
+    </biblioentry>
+
+
+    <biblioentry>
+        <title> Materialized View Creation and Transformation of Schemas in Highly Available Database Systems
+        </title>
+        <author><personname>Jørgen Løland
+        </personname></author>
+    </biblioentry>
+
+    <biblioentry>
+        <author><personname>Fay Chang, Jeffrey Dean, Sanjay Ghemawat, Wilson C. Hsieh, Deborah A. Wallach
+Mike Burrows, Tushar Chandra, Andrew Fikes, Robert E. Gruber</personname></author>
+        <title>Bigtable: A Distributed Storage System for Structured Data</title>
+    </biblioentry>
+
+
+    <biblioentry>
+        <author><personname>Jason Baker, Chris Bond, James C. Corbett, JJ Furman, Andrey Khorlin, James Larson,
+Jean-Michel Leon, Yawei Li, Alexander Lloyd, Vadim Yushprakh
+        </personname></author>
+        <title>Megastore: Providing Scalable, Highly Available
+Storage for Interactive Services
+        </title>
+    </biblioentry>
+ 
+    <biblioentry>
+        <title>
+Chord: A Scalable Peer-to-peer Lookup Service for Internet
+Applications
+        </title>
+        <author><personname>
+Ion Stoica, Robert Morris, David Karger, M. Frans Kaashoek, Hari Balakrishnan
+        </personname></author>
+    </biblioentry>
+
+    <biblioentry>
+        <title>
+Dynamo: Amazon’s Highly Available Key-value Store
+        </title>
+        <author><personname>
+Giuseppe DeCandia, Deniz Hastorun, Madan Jampani, Gunavardhan Kakulapati,
+Avinash Lakshman, Alex Pilchin, Swaminathan Sivasubramanian, Peter Vosshall
+and Werner Vogels
+        </personname></author>
+    </biblioentry>
+
+</bibliography>
+</book>
+<!--
+vim: tw=66 syntax=docbk
+vim: spell spelllang=en_us
+-->
