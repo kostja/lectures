@@ -1,0 +1,67 @@
+3 История NoSQL движения
+
+
+Way back in the 1960s databases didn’t separate data representation
+and data access.
+
+To navigate in an index, a database user had to know the physical
+structure of the index.
+
+Obvious deficiencies of the approach led to introduction of separation of
+data model and data representation. Relational model is one and still
+the most popular way to do it.
+
+One of the most well known deficiencies of a relational model is the
+so-called object-relational impedance mismatch: there is more than one way
+to map objects to relations, and none of them fits all access
+patterns well.
+
+It has as well a number of advantages: simplicity, ease of analytical
+processing, and, let’s not forget, performance: by normalizing data, a
+user is forced to tell the DBMS more about data constraints, distribution,
+future access patterns.
+
+This makes building efficient and to-the-point data representation
+structures easier.
+
+Unfortunately, the past generations of database management systems did not
+address one of the main architecture drawbacks, which plagues the relational
+model: rigidity of schema change. Very few mainstream DBMS allow to change
+the structure of a relational database quickly, without downtime or
+significant performance penalty. This is not a drawback of the relational
+model, but of one which relates to the implementation.
+Good luck consistently changing database schema in a cluster of databases.
+
+It should also be kept in mind that in many cases a relational model is an
+overkill, and a simple key to value mapping is sufficient.
+
+And of course no single model can fit all needs (e.g. graph databases build
+around the notion of nodes & edges, yet, good luck trying to quickly
+calculate CUBE on a bunch of nodes in a graph database).
+
+Unfortunately, the world of NoSQL, when it comes to the data model, often
+simply takes us back to the 60s: there is minimal abstraction of data access
+from data representation, and once a certain representation has been chosen,
+there is no way to change it without rewriting your application (e.g. to fit
+the new performance profile).
+
+Scalability is an answer, but a silly one: throwing more hardware at a
+problem is not always economical. 
+
+==========================================================================
+
+Термин NoSQL сформулировал Eric Evans из Rackspace.
+
+Google BigTable и Amazon Dynamo можно объективно назвать основателями
+NoSQL движения. Здесь достаточно рассмотреть use case на который они
+были рассчитаны.
+
+
+“Shard MySQL to handle high write loads, cache objects in memcached to handle
+high read
+loads, and then write a lot of glue code to make it all work together. That
+was state of the art,
+that was how it was done. The architecture of many major sites still
+follow[sic!] this pattern
+today, largely because with enough elbow grease, it works.” (cf. [Hof10c])
+

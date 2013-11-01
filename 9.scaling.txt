@@ -1,0 +1,63 @@
+Once you decide to scale out, the mesmerizing world of Distributed Systems
+comes into play. And for entering this arena, first you need to know CAP
+theorem and its implications. There is a very good formal proof by Nancy Lynch
+and Seth Gilbert, for the CAP theorem:
+Brewer's conjecture and the feasibility of consistent, available,
+partition-tolerant web services
+But if you want a really simple introduction to CAP theorem, then you can read
+this blog post. I liked it for its simplicity.
+A plain English introduction to CAP theorem " Kaushik Sathupadi
+Once you enter the arena, read the following research papers:
+(a) Dynamo - amazon's highly available key-value store(by Avinash Lakshman et.
+al from Amazon)
+Dynamo paper is the seminal paper in the field
+(b) Bigtable: a distributed storage system for structured data(by Jeff Dean
+and Sanjay Ghemawat from Google)
+Google's NoSQL system for their internal requirements
+(c) Cassandra: a decentralized structured storage system(by Avinash Lakshman
+and Prashant Malik from Facebook)
+
+Способы масштабирования СУБД
+
+Shard-memory, shared disk, shared nothing - история терминов.
+
+Вертикальное масштабирование.
+
+Проблемы вертикального масштабирования - общий доступ к данным.
+При этом было множество вертикально масштабируемых систем
+
+Master-slave репликация. Проблемы мастер-слейв репликации.
+Read-scaling. 
+
+Master-master репликация. Проблемы мастер-мастер репликации.
+Что такое виртуальная синхронность.
+
+Добро пожаловать в мир распределённых вычислений!
+
+Eight fallacies of distributed computing (cf. [Gos07]2 :
+“Essentially everyone, when they first build a distributed application,
+makes the following eight
+assumptions. All prove to be false in the long run and all cause big trouble
+and painful learning
+experiences.
+1. The network is reliable
+2. Latency is zero
+3. Bandwidth is infinite
+4. The network is secure
+5. Topology doesn’t change
+6. There is one administrator
+7. Transport cost is zero
+8. The network is homogeneous”
+
+Проблема консистентности распределённых ДКА:
+- двухфазный коммит.
+- паксос и рафт
+- CAP теорема
+- Eventual consistency И другие модели консистентности (
+  read your writes availability)
+- time and clock in a distributed system
+
+Горизонтальное масштабирование - шардинг.
+
+http://en.wikipedia.org/wiki/Virtual_synchrony
+https://github.com/couchbaselabs/TouchDB-iOS/wiki/Replication-Algorithm

@@ -1,0 +1,12 @@
+- auto-increment based sharding (date, etc)
+- hash partitioning
+
+- consistent hashing
+  -> ketama
+  -> murmur
+
+- B-trees
+
+- prefix trees
+
+

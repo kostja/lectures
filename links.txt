@@ -1,0 +1,112 @@
+Time, clock and order of events in distributed systems, by Leslie Lamport
+
+Paxos made simple, by Leslie Lamport
+
+It's time for a complete rewrite
+
+Third manifesto
+
+Spanner paper
+
+Dynamo paper
+
+BigTable paper 
+
+Liskov Substitution principle
+
+ARIES paper
+
+Architecture of a Database System
+Joseph M. Hellerstein, Michael Stonebraker
+and James Hamilton
+
+
+It's time for a complete rewrite
+
+Third manifesto
+
+Spanner paper
+
+Dynamo paper
+
+BigTable paper 
+
+
+Raft distributed cconsenus 
+
+Transaction processing
+
+Database systems, the complete book
+
+ARIES paper
+
+Wielfried, Wokum
+
+
+http://dbmsmusings.blogspot.in/2010/04/problems-with-cap-and-yahoos-little.html
+http://www.amazon.com/NoSQL-Distilled-Emerging-Polyglot-Persistence/dp/0321826620/ref=sr_1_1?s=books&ie=UTF8&qid=1375953296&sr=1-1&keywords=nosql+distilled+a+brief+guide+to+the+emerging+world+of+polyglot+persistence
+
+http://ksat.me/a-plain-english-introduction-to-cap-theorem/
+www.christof-strauch.de/nosqldbs.pdf
+
+eric evans domain driven design
+
+Seven databases in seven weeks.
+
+The Dangers of Replication and a Solution
+
+What Every Programmer Should Know About Memory
+Ulrich Drepper
+Red Hat, Inc.
+drepper@redhat.com
+November 21, 2007
+Abstract
+As CPU cores become both faster and more numerous, the limiting factor for
+most programs is
+
+Technical Standard
+Distributed Transaction Processing:
+The XA Specification
+
+Is SQL Really A Standard Anymore?
+
+Cache-oblivious B-trees Bener, Colton
+
+The
+Log-Structured
+Merge-Tree
+(LSM-Tree)
+Patrick O'Neil1 , Edward Cheng2
+Dieter Gawlick 3 , Elizabeth O'Neil1
+To be published: Acta Informatica
+
+
+Binary Trees Implementations
+Comparison for Multicore
+Programming
+Technical report
+
+
+Data structures and algorithms in a two-level memory
+Ramzi Fadel
+Kim Vagn Jakobsen
+
+The end of architectural era
+
+
+Cache-Oblivious Streaming B-trees
+Michael A. Bender Martin Farach-Colton Jeremy T. Fineman
+Dept. of Computer Science Dept. of Computer Science MIT CSAIL
+Stony Brook University Rutgers University 32 Vassar Street
+Stony Brook, NY 11794-4400 Piscataway, NJ 08855 Cambridge, MA 02139
+
+
+Multi-ring paxos 
+Parisa Jalili Marandi
+University of Lugano (USI)
+c
+
+
+The Byzantine Generals Problem
+LESLIE LAMPORT, ROBERT SHOSTAK, and MARSHALL PEASE
+

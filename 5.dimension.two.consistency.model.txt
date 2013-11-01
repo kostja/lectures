@@ -1,0 +1,152 @@
+5. Модели консистентности данных.
+
+Что такое консистентность?
+
+Для того, чтобы дать начальное рассмотрение моделям консистентности
+данных обратимся к C в ACID. C идёт рука об руку с durability, 
+и уходит корнями в понятие "последовательной истории". Т.е.
+консистентность - это в первую очередь непротиворечивая история
+событий при наличии глобальных часов. Удивительно каким образом
+здесь теория СУБД перекликается с общей теорией относительности:
+ложки нет.
+
+В распределённой система может иметь лишь частичное упорядочение, 
+и для того чтобы ввести глобальный порядок необходим обмен сообщениями.
+Поэтому, по сути, модели консистентности NoSQL систем - это различные
+наборы правил обмена сообщениями, дающие разную степень глобальной
+упорядоченности событий. 
+
+При этом надо понимать, что требование обмена сообщениями
+идёт вразрез как с требованием масштабируемости системы (если
+объём необходимого обмена зависит от числа узлов в кластере,
+то система не масштабируется линейно) так и стребованием 
+высокой доступности. Последнее было сформулировано Eric Brewer
+в его CAP conjecture. 
+
+Рассмотрим подробнее CAP conjecture Брюера.
+
+Не вдаваяс в детали, Брюер утверждает, что система, состоящая
+из узлов обменивающихся сообщениями, и обладающая такими 
+свойствами как консистентность С, доступность (availability) A
+и устойчивость к потере связи между узлами (partition tolerance),
+в случае именно этого события network partitioning имеет возможность
+сохранить лишь одно из свойств: C или A.
+
+В реальности, однако, всё гораздо сложнее чем описано у Брюера.
+Во-первых, "системой" в понимании Брюера является не СУБД 
+в целом, а узлы обменивающиеся сообщениями, и консистентная
+история очень часто состоит из непересекающихся эпизодов. СУБД может
+предпочитать A С в одной цепочке событий, и C A в другой. 
+
+Во вторых, если речь идёт о консистентности даже в пределах одного
+эпизода, то есть много видов потенциально возникающих аномалий,
+и решение о том, являются ли определённые виды неконсистентности
+допустимыми - это бизнес-решение.
+
+Два примера: резервация номера в гостинице и резервация авиаперелётов
+
+
+Наболее сильной моделью упорядоченности является serial history,
+из определения транзакционных систем. 
+
+Вторая размерность консистентности возникает в кластеризованных
+базах данных - и часто, ACID предлагаемый транзакционными
+баами overkill.
+
+Но давайте не сходить с ума по поводу Paxos или eventual consistency
+- мир репликации традиционных баз данных также предлагает 
+нам некотоыре модели консистентности.
+
+Поэтому можно ввести следующие классы моделей консистентности 
+(о как):
+
+gossip  - virtual synchrony - distributed state machines & quorum - 
+database transactions
+
+ACID = Atomicity, Consistency, Isolation,
+and Durability
+•  BASE = Basically Available, Soft state,
+Eventually consistent
+
+
+Каждый класс содержит десятки если не сотни протоколов, разные
+в деталях и в свойствах производительности, но имеющие общие
+для класса свойства в отношении предоставляемых гарантий.
+
+The power of gossip lies in the robust spread of information. Even
+if Dave had trouble understanding Bob, he will probably run into
+someone else soon and can learn the news that way.
+
+Тажке, не надо путать распределённые транзакции и консистентную репликацию 
+- в репликации *транзакция всегда происходит на одном узле*, 
+в распределённых транзакциях равноправные участники - несколько узлов
+
+Таким образом master-master != paxos, paxos is an overkill 
+unless you're agreeing on the consensus at what your cluster is.
+
+Зачем нужно вычислять консенсус в кластере? 
+
+Пример для консистентности - резервирование в авиалиний.
+
+Вам приходило в голову почему есть понятие резервирование? Почему иногда
+резервирование не проходит? И почему иногда случается так, что даже 
+при наличии билета места на самолёте не находится и вас сажают в
+бизнес-класс либо сажают на другой самолёт?
+
+Об юните консистентности
+------------------------
+Graph databases are most of the time ACID and single-machine (vertically
+scalable, not horizontally scalable).
+Reason: very detailed, very low-level. So in a graph database you
+typically change *many* atoms at once, so you need acid to keep
+these changes atomically.
+
+Aggregates are a hint for ACID too, since if your data is
+not normalized, what yu previosuly had to do with a multi-statemnt
+transaction now you can do by rreplacing an entire aggregate.
+
+Aggregates also reflect the workflow in an online system -
+you display the curren state of the document, and let 
+the document be updated later on. So you can't put it into 
+a single transaction. 
+
+
+Strict Consistency according to Lipcon means that “All read operations must
+return data from the latest completed write operation, regardless of which
+replica the operations went to”. This implies that either read and write
+operations for a given dataset have to be executed on the same node2 or that
+strict consistency is assured by a distributed transaction protocol (like
+two-phase-commit or Paxos).  As we have seen above, such a strict consistency
+cannot be achieved together with availability and partition tolerance
+according to the CAP-theorem.
+
+
+Eventual Consistency means that readers will see writes, as time goes on: “In
+a steady state, the system will eventually return the last written value”.
+Clients therefore may face an inconsistent state of data as updates are in
+progress. For instance, in a replicated database updates may go to one node
+which replicates the latest version to all other nodes that contain a replica
+of the modified dataset so that the replica nodes eventually will have the
+latest version.  Lipcon and Ho point out that an eventually consistent system
+may provide more differentiated, additional guarantees to its clients (cf.
+[Lip09, slide 16], [Ho09a]):
+
+
+Read Your Own Writes (RYOW) Consistency signifies that a client sees his
+updates immediately after they have been issued and completed, regardless if
+he wrote to one server and in the following reads from different servers.
+Updates by other clients are not visible to him instantly.
+
+Session Consistency means read your own writes consistency which is limited
+to a session scope (usually bound to one server), so a client sees his
+updates immediately only if read requests after an update are issued in the
+same session scope.
+
+Casual Consistency expresses that if one client reads version x and
+subsequently writes version y, any client reading version y will also see
+version x.
+
+
+Monotonic Read Consistency provides the time monotonicity guarantee that
+clients will only see more updated versions of the data in future requests.
+
