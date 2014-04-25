@@ -1,0 +1,195 @@
+Another way to understand why 2pl locking works
+-----------------------------------------------
+                   modify
+                  --------
+            lock /        \ unlock
+                /          \
+A transaction accumulates locks, and then instantly
+modifies all data elements at the time of unlocking.
+
+Why real-world system have a more complicated
+---------------------------------------------
+lock compatibility matrix
+-------------------------
+
+Compatibility matrix for MySQL metadata operations
+
+     Request  |  Granted requests for lock       |
+      type    | S  SH  SR  SW  SU  SNW  SNRW  X  |
+    ----------+----------------------------------+
+    S         | +   +   +   +   +   +    +    -  |
+    SH        | +   +   +   +   +   +    +    -  |
+    SR        | +   +   +   +   +   +    -    -  |
+    SW        | +   +   +   +   +   -    -    -  |
+    SU        | +   +   +   +   -   -    -    -  |
+    SNW       | +   +   +   -   -   -    -    -  |
+    SNRW      | +   +   -   -   -   -    -    -  |
+    X         | -   -   -   -   -   -    -    -  |
+    SU -> X   | -   -   -   -   0   0    0    0  |
+    SNW -> X  | -   -   -   0   0   0    0    0  |
+    SNRW -> X | -   -   0   0   0   0    0    0  |
+
+  The second array specifies if particular type of request can be satisfied
+  if there is waiting request for the same lock of certain type. In other
+  words it specifies what is the priority of different lock types.
+
+     Request  |  Pending requests for lock      |
+      type    | S  SH  SR  SW  SU  SNW  SNRW  X |
+    ----------+---------------------------------+
+    S         | +   +   +   +   +   +     +   - |
+    SH        | +   +   +   +   +   +     +   + |
+    SR        | +   +   +   +   +   +     -   - |
+    SW        | +   +   +   +   +   -     -   - |
+    SU        | +   +   +   +   +   +     +   - |
+    SNW       | +   +   +   +   +   +     +   - |
+    SNRW      | +   +   +   +   +   +     +   - |
+    X         | +   +   +   +   +   +     +   + |
+    SU -> X   | +   +   +   +   +   +     +   + |
+    SNW -> X  | +   +   +   +   +   +     +   + |
+    SNRW -> X | +   +   +   +   +   +     +   + |
+
+
+shared, shared read, shared write, shared no read, shared no write, 
+shared upgradeable, shared no read write, exclusive
+
+Considerations reflected in the matrix:
+- lock starvation, and henceforth lock priority
+- lock upgrades, and henceforth lock incompatibility
+matrix is differnt - it's ugpradeable, and henceforth is incompatible
+with each other
+- special cases: intention exclusive lock, intention shared, etc
+(a warning lock), auto_increment/concurrent insert lock
+- next-key locking and phantoms
+
+2pl locking and physical locking
+--------------------------------
+
+(Crab locking, or tree locking)
+
+Alternatives to 2PL locking
+---------------------------
+
+Are there simple alternatives to 2PL locking algorithm?
+
+* optimistic concurrency control
+  * timestamping
+  * validation
+* batched transaction execution
+* multi-version concurrency control
+
+and combinations of thereof.
+
+Optimistic concurrency control
+------------------------------
+Optimistic concurrency control works well under circumstances
+when there are no or few conflicts, since it assuems the
+
+Batched transaction execution
+-----------------------------
+
+Before we go on to MVCC, 
+
+Mechanisms of latching
+----------------------
+
+Locking is logical - but there is another problem related
+to concurrent transaction execution, and it is concurrent 
+access to an data index. 
+
+One algorithm for concurrent index access is
+
+
+Lock congestion and probability of deadlock.
+
+
+Optimistic control
+-------------------
+
+Validation: you collect all records in transaction log
+as long as you update them.
+
+Timestamping: you put a timestamp on every row on every read (T(R))
+or write (T(W)), as well as you assign timestaps to the transaction,
+and abort a transaction when/if you find a record
+with a timestamp newer than your transaction id (reads after writes,
+writes after reads). So timestamps are ascending numbers, you don't
+have to use clocks.
+
+Thomas write rule: writes can be skipped when there is a write
+with a newer timestap already.
+
+Rules for optimistic timestamp-based scheduler:
+
+1. r1(x):
+
+a) if ts(1) >= wt(x) then read is physically realizable
+
+  0) if c(x) is true, grant the request. Update
+     rt(x) with ts(1), if ts(1) > rt(x)
+  1) if c(x) is false, delay t until c(x) becomes true or the transaction
+     that wrote X aborts
+ 
+b) if ts(1) < wt(x) then read is physically unrealizable.  Rollback (t)
+abort T and restart it with a newer timestamp.
+
+2. w1(x)
+
+  a) if ts(1) >= rt(x) and tx(1) >= wt(x) the write is physically realizable      and must be performed.
+
+     write the new value of X
+     set wt(x) to ts(1)
+     clear commit bit of (x)
+
+  b) if ts(1) >= rt(x) but ts(1) < wt(x), then write
+     is physically realizable but there is a already a 
+     later write in X. if C(x) is true, then the previous writer of
+     X is comitted, wand we simple ignore the write by !. We allow 
+     1 to proceed and make no change to the database. However,
+     if commit bit is dirty, then we must delay T
+     the same way as in read.
+
+  c)  ts(1) < rt(1) thenn the write is physically unrealizable, and T
+      must be rolled back.
+
+3) Suppose the rscheduler receives a request to commit 1.
+   It msut clear or dirty commit bits for all modified
+   records by 1, and wake up all waiters.
+
+4) In case of rollback, the same - clear commit bit, 
+   wake up all waiters, but the waiter has to re-try, 
+   with the new data/commit status.
+  
+MVCC: you keep old versions in addition to the old
+ones, and purge them in the background.
+
+With this in mind, there is:
+
+- read uncommitted
+- read committed
+- repeatable read/snapshot isolation
+- serializable
+
+-> isolation levels
+
+
+Part 2
+------
+
+UNDO/REDO logging and checkpointing
+
+Mention idempotency of recovery
+Mention Stoev test - continuous crashes during recovery
+
+Redo logging
+------------
+
+Problem of UNDO logging
+-----------------------
+
+With UNDO logging we can't commit a transaction without
+first writing all its changed data to disk. 
+
+This is more than strictly necessary to recovery, since the data is already
+in the WAL
+
+

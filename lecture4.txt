@@ -1,0 +1,308 @@
+Cache oblivious algorithms
+-------------------------
+
+Cache oblivioius static search tree
+
+Build a static data structure so that you can searhc
+among these items quickly.
+
+Input: A tree of N elements.
+
+Imagine we store them in a binary tree in order. We don't know what the B 
+is, so we don't use B-tree.
+
+The key is how we layout that tree (a triangle).
+In a usual way.
+
+The idea is: we'd like some of the nodes near the root
+to be clustered in the same block, but we don't know what the
+block size is. So how do we structure them?
+
+
+What we do is we cut in the middle of the triangle. The height
+of the original tree is lg(N), the height of the top
+triangle is sqrt(N), which is sqrt(N)/2 leaves, and sqrt(N) subtrees
+
+then we recursively layout these sqrt(N) + 1 subtrees, and then
+concatenate. 
+
+
+This is a recursive layout of the binary search tree.
+
+
+Let's now calcualte the cost of MT(tree) per a single search.
+
+Example: tree of 15 elements. Height 4. Divide in the middle,
+squash.
+
+If you want a binary tree - your block size is 1, block size 4 - 
+you structure it like in the example, block size 15 - entire
+tree is in a singel block.
+
+You stop cutting is when the height of the tree is at most lg B.
+So it's at least lgB/2
+
+Now how do you search in this?
+
+You find the nearest node, and jump to its "triangle". Then repeat
+the search in this node.
+
+Stop cutting at the point when the triangle is guaranteed to fit
+in a block.
+
+So, you search in 2 triangles - final cases.
+
+How many times do you repeat this? The subtree size is at most B 
+- normally between B and B^2.
+
+So you repeat this at most lgB(N) times
+
+Since the height of the triange is at least 1/2 lg B, you repeat
+this 2 * lgN/lgB times (height of the tree divided by the hight of the
+triangle). At most it each triangle in 2 blocks in worst case.
+
+4 lg B (N).
+
+Not quite as good as B-tree in terms of the constants, but pretty good.
+
+--------------------------------------------------------------------
+Fractional cascading
+
+Warmup: 
+
+K lists and each list has size N, they are sorted. 
+
+Task: search for X in all lists - but it's necessary to find out
+predecessor and successor in each list.
+
+Straightforward decision: K binary search.
+
+The optimal bound is O(k + lgN) 
+
+The idea is that if I find a value in list N and then follow a pointer
+from this where I want to go next, I'll be done.
+
+Sadly that can't be done - because entire second list may lay in the
+range of predecessor/successor of the first list.
+
+So iinstead what we do, how do we rebuild the list to prepare them?
+
+So we add every other item in Lk  to Lk - 1, and produce
+a new list Lk - 1 prime -- this is what it makes it fractional - the
+fraction is 1/2.
+
+Thsi new list is Li-1 prime
+
+In general: add every other in Li prime to Li-1, to form Li-1 prime
+
+Size |Liprime| is N + 1/2N + 1/4N = 2N
+
+So the lists didn't get much bigger, but the problem of ranges is solved.
+
+Now it's useful to have pointers from L1 to L2.
+
+How do we do the search: start at the top, lg(N) at the top, 
+now I need to find out where it fits in the next list. So you have
+in every node a pointer to previos and next node (red nodes).
+
+I spend constant time to look at neighbors, etc. 
+
+
+Now, it's in the primed list. I need position in the original list.
+So every promoted item also gets a poitner to the nearest non-promoted
+item in the original list.
+
+
+
+Correct execution of transactions
+---------------------------------
+
+The database is composed of elements - best to think about 
+it as documents, ojbcects, disk pages, or simply tuples/records.
+An element is indivisible from concurrency control point of
+view: i.e. it's possible to *read* element and *write* element. 
+
+
+A database has a state, whichis a value of its elements. 
+
+
+Consistency of a relational database is formuated in terms of constraints,
+triggers, and referential integrity.
+
+The correctness pricniple for consistency otherwise states:
+
+- if a database is in a consistent state, and a transaction executes
+in absense of any other transactions or system errors, the database is
+also in a consistent state when a transaction finishes.
+
+
+- intiutively a transaction can do something bad, from user's perception
+of consistency point of view, but this is not what consistency principel
+is about.
+
+It is formulated to put the light on the problem of concurrent execution.
+
+
+
+2PL theorem
+-----------
+
+
+Logging and recovery
+---------------------
+
+Purpose of logging is in an event of a crash to restore what taransactions
+were doing when the crash occurred.
+
+A major question is whether to log or not to log partial effects of
+transactions. First favors short and quickly-running transactions,
+second favours big or long-running transactions. If you can write
+partial transactions out, you have better strategies in optimizing 
+buffer cache flushes. 
+
+To repair effects of a crash, some transactions will have their 
+effect undone (undo logging) and some transactions will be redone (redo
+logging). 
+
+Undo logging does not record the new value of the database element,
+only the old value. When recovering using an undo log, we "play
+backwards", applying undo log records, until we reach a consistent
+database state. 
+
+To make it possible, there are the two rules the tx manager must
+follow:
+
+- 
+
+U1 if transaction T modifies database element X, then the log record of
+the form T, X, v must be written to disk *before*
+the new value of X is written to disk
+
+U2. if transaction commits, then its commit log record
+must be written to disk only *aftr* all database elements changed fy the
+transaction have been written to disk, but as soon thereafter
+as possible.
+
+a) write log records of txn b) write changed pages c) write commit record
+
+
+Now imagine this in a concurrent environment. It still works,
+with a continuing global log: it allows FLUSH LOG command to happen
+at any time.
+
+
+
+
+Checkpointing
+-------------
+The checkpointing is an technique which allows us to not examine
+the entire log in case of a crash. Checkpointing allows portions of the
+log to be thrown away.
+
+
+
+
+
+
+
+
+A sharp checkpoint is accomplished by flushing all modified pages for
+committed transactions to disk, and writing down the log sequence number
+(LSN) of the most recent committed transaction. Modified pages for
+uncommitted transactions should not be flushed – that would violate the rule
+of write-ahead logging. (This is a deliberate and gross over-simplification;
+I will not draw attention to further simplifications I make.) Upon recovery,
+log REDO can start from the LSN at which the checkpoint took place. A sharp
+checkpoint is called “sharp” because everything that is flushed to disk for
+the checkpoint is consistent as of a single point in time – the checkpoint
+LSN.
+
+A fuzzy checkpoint is more complex. It flushes pages as time passes, until
+it has flushed all pages that a sharp checkpoint would have done. It
+completes by writing down two LSNs: when the checkpoint started and when it
+ended. But the pages it flushed might not all be consistent with each other
+as of a single point in time, which is why it’s called “fuzzy.” A page that
+got flushed early might have been modified since then, and a page that got
+flushed late might have a newer LSN than the starting LSN. A fuzzy checkpoint
+can conceptually be converted into a sharp checkpoint by performing REDO from
+the starting LSN to the ending LSN. Upon recovery, then, REDO can begin from
+the LSN at which the checkpoint started.
+
+Here is where the weeds get deep: I will try to explain some of the
+subtleties that let InnoDB provide uniform quality of service by performing
+checkpoints almost constantly, instead of checkpoints being significant
+events that occur periodically. It can be said that InnoDB actually never
+does a checkpoint during normal operation. Instead, the state of the database
+on disk is a constantly advancing fuzzy checkpoint. The advances are
+performed by regular flushing of dirty pages as a normal part of the
+database’s operation. The details are far too many and complex to write here,
+in part because they have changed significantly as new versions have been
+released, but I will try to sketch the outline.
+
+InnoDB maintains a large buffer pool in memory with many database pages, and
+doesn’t write modifications to disk immediately. Instead, it keeps dirty
+pages in memory, hoping that they will be modified many times before they are
+written to disk. This is called write combining, and is a performance
+optimization. InnoDB keeps track of the pages in the buffer pool through
+several lists: the free list notes which pages are available to be used, the
+LRU list notes which pages have been used least recently, and the flush list
+contains all of the dirty pages in LSN order, least-recently-modified first.
+
+These lists are all important, but for the simplified explanation here, I
+will focus on the flush list. InnoDB has limited space in the buffer pool,
+and if there aren’t any free spots to store a page that InnoDB needs to read
+from disk, it must flush and free a dirty page to make room. This is slow, so
+InnoDB tries to avoid the need for this by flushing dirty pages continually,
+keeping a reserve of clean pages that can be replaced without having to be
+flushed. It flushes the oldest-modified pages from the flush list on a
+regular basis, trying to keep from hitting certain high-water marks. It
+chooses the pages based on their physical locations on disk and their LSN
+(which is their modification time).
+
+In addition to avoiding the high-water marks, InnoDB must avoid a very
+important low-water mark as well. The transaction logs (aka REDO logs, WAL
+logs) in InnoDB are fixed-size, and are written in a circular fashion. But
+spaces in the logs cannot be overwritten if they contain records of changes
+to a dirty page that hasn’t been flushed yet. If that happened and the server
+crashed, all records of those changes would be lost. Therefore, InnoDB has a
+limited amount of time to write out a given page’s modifications, because the
+ongoing transaction logging is hungry for space in the logs. The size of the
+logs imposes the limit. If the log writing activity wraps around in a circle
+and bumps into its own tail, it will cause a very bad server stall while
+InnoDB scrambles to free up some room in the logs. This is why InnoDB
+generally chooses to flush in oldest-modification order: the oldest-modified
+pages are the furthest behind in the logs, and will be bumped into first. The
+oldest unflushed dirty page’s LSN is the low-water mark in the transaction
+logs, and InnoDB tries to raise that low-water mark to keep as much room
+available in the transaction logs as it can. Making the logs larger reduces
+the urgency of freeing up log space and and permits various performance
+optimizations to do the flushing more efficiently.
+
+And now, with that simplified explanation in place, we can understand how
+InnoDB actually makes a fuzzy checkpoint. When InnoDB flushes dirty pages to
+disk, it finds the oldest dirty page’s LSN and treats that as the checkpoint
+low-water mark. It then writes this to the transaction log header. You can
+see this in the functions log_checkpoint_margin() and log_checkpoint().
+Therefore, every time InnoDB flushes dirty pages from the head of the flush
+list, it is actually making a checkpoint by advancing the oldest LSN in the
+system. And that is how continual fuzzy checkpointing is implemented without
+ever “doing a checkpoint” as a separate event. If there is a server crash,
+then recovery simply proceeds from the oldest LSN onwards.
+
+When InnoDB shuts down, it does some additional work. First, it stops all
+updates to data; then it flushes all dirty buffers to disk; then it writes
+the current LSN to the transaction logs. This is the sharp checkpoint.
+Additionally, it writes the LSN to the first page of each data file in the
+database, which serves as a signal that they have been checkpointed up to
+that LSN. This permits further optimizations during recovery and when opening
+these data files.
+
+There is a lot more to study if you want to learn how it’s really done in
+detail; there are many fine points to the process. This is one area where the
+usually excellent manual is a bit lacking. Some of the best resources are as
+follows:
+
+How physiological recovery works in MVCC
+----------------------------------------
+- undo not needed
+- only find the right snapshot and redo after it

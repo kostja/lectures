@@ -1,0 +1,44 @@
+- 
+- Some boxes represent system components, double boxes are also in-memory
+  data structures
+
+- DML follows the path of the left side. DDL follows the path of the
+right side
+
+- transaction processing, two views:
+ - AI - concurrency control mechanisms, lock manager, scheduler, 
+ - CD - consistency, durability - logging and recovery manager
+
+acid  - coined in 1983 by andreas reuters
+
+atomicity - any transaction or completes, or rollbacks, no part
+of transaction is left of the system in case of rollback
+
+A typical example of atomicity failure is in accounting, money transfer:
+subtract from one account, add to another account.
+
+e.g.:
+ - one part of transaction fails - all fails
+ - type of failure: power failure, crash, resource allocation error, bug
+
+consistency - brings database from one valid state to another.
+In a relational valid is defined by constraitns, triggers, foreign keys
+ consistency is very general, so an example would based on a
+ consistency instrument implemented in the database. 
+
+isolation -  principle of serial history, even though the transactions
+may execute concurrently, it's possibe to come up with a serial order
+of execution for them. 
+
+
+T1 subtracts 10 from A.
+T1 adds 10 to B.
+T2 subtracts 10 from B.
+T2 adds 10 to A.
+
+ - wikipedia example
+
+durability - once a transaction is committed, it will remain in the database
+ - violation: power loss, machine failure, site failiure, bug
+
+ - success message is sent to the client - mongodb

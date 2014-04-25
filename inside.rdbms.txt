@@ -1,0 +1,18 @@
+
+- networking
+- authentication & access
+- sql parser
+  Abstract Syntax Tree
+
+- optimizer:
+   cost optimizer:
+     query rewrite
+     join optimizer
+   execution engine, access methods
+
+- storage
+  lock manager undo/redo block manager
+
+
+- replication
+

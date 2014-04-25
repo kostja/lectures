@@ -1,0 +1,51 @@
+21:33:40] konstantinosipov: Дима, привет!
+[21:34:13] konstantinosipov: а не вспомнишь пример когда нам для foreign key
+constraints/triggers нужен был строгий 2pl от innodb (serializable isolation
+level), и mvcc не помогал?
+[22:32:14] Dmitri Lenev: привет
+[22:32:28] Dmitri Lenev: мне кажется ты смешиваешь понятия
+[22:32:41] Dmitri Lenev: для FK недостаточно repetable read
+[22:32:57] Dmitri Lenev: aka consistent snapshot
+[22:33:40] Dmitri Lenev: но на mvcc они могут работать, просто нужны или гэп
+локи, или всякие трюки типа тех что мы использовали в Фальконе
+[22:34:01] Dmitri Lenev: почему не достаточен repeatable read пример простой
+[22:34:22] Dmitri Lenev: create table child (fk int references parent(pk))l
+[22:34:33] Dmitri Lenev: create table parent(pk int primary key);
+[22:34:42] Dmitri Lenev: insert into parent values (1);
+[22:35:11] Dmitri Lenev: trx1: start transaction with consistent snapshot;
+[22:35:28] Dmitri Lenev: trx2: start transaction with consistent snapshot;
+[22:35:38] Dmitri Lenev: trx2: select * from child;
+[22:35:49] Dmitri Lenev: trx1: insert into child values (1);
+[22:35:57] Dmitri Lenev: trx2: delete from parent;
+[22:36:15] Dmitri Lenev: oops trx2 should not see row in child according to
+repeatable read
+[22:36:22] Dmitri Lenev: so row from parent gets deleted
+[22:36:30] Dmitri Lenev: and we have inconsistency
+[22:37:58] Dmitri Lenev: С MVCC этот пример будет работать если проверки FK
+будут забивать на repeatable read/consistent snapshot и видеть/смотреть на то
+что делают другие транзакции
+[22:39:22] Dmitri Lenev: то есть delete в trx2 должен увидеть что есть trx1
+которая вставила в child и не закоммитила и ждать
+[22:43:09] konstantinosipov: о спс
+[22:43:14] konstantinosipov: я студентам завтра раскажу
+[22:43:22] konstantinosipov: ты ответил на мой вопрос, я именно это и
+спрашивал
+[22:44:06] konstantinosipov: смысл такой: я пытаюсь объснить студентам зачем
+нужны record level locks даже при  mvcc
+[22:44:09] konstantinosipov: зачем они полезны
+[22:44:22] konstantinosipov: пытаюсь показать им разницу между mvcc и
+serializable
+[22:44:40] konstantinosipov: что на mvcc чистом со snapshot isolation
+serializable недостижим
+[22:45:21] Dmitri Lenev: ну это да... можно подойти со стороны timestamping
+[22:45:44] Dmitri Lenev: сказать что вот timestamping вроде почти mvcc но дает
+serializable
+[22:46:01] Dmitri Lenev: за счет чего ? потому что чтения помечают записи как
+прочитанные
+[22:46:39] konstantinosipov: да
+[22:47:13] Dmitri Lenev: то есть там есть два аспекта
+[22:47:23] Dmitri Lenev: 1) это чтения
+[22:47:34] Dmitri Lenev: 2) это дырки/предикатные локи
+[22:47:39] konstantinosipov: угу
+[22:49:39] Dmitri Lenev: с FK в Фальконе мы планировали обходить 2)
+
