@@ -1,9 +1,7 @@
-#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include "sort.h"
 #define CACHELINE_SIZE 64
-
-typedef int (*cmp_t)(const void *, const void *);
 
 struct funnel {
 	struct funnel  *lr[2];
@@ -105,6 +103,7 @@ funnel_fill(struct funnel *funnel)
 				}
 				return;
 			}
+			res = !res;
 		}
 		res = funnel->cmp(lr[0], lr[1]) > 0 ? 1 : 0;
 		memcpy(funnel->out + i * funnel->size, lr[res], funnel->size);
