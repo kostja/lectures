@@ -1,3 +1,9 @@
+http://highscalability.com/blog/2014/8/6/tokutek-white-paper-a-comparison-of-log-structured-merge-lsm.html
+
+http://blog.memsql.com/common-pitfalls-in-writing-lock-free-algorithms/
+
+http://www.youtube.com/watch?v=IyWOjd-oZ4o
+
 Time, clock and order of events in distributed systems, by Leslie Lamport
 
 Paxos made simple, by Leslie Lamport
