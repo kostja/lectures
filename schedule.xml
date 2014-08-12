@@ -128,7 +128,7 @@
 </section>
 
 <section>
-<title>Основы устройства системы по обработке транзакций</title>
+<title>Основы устройства СУБД</title>
 
 <orderedlist>
 <listitem>
@@ -261,6 +261,357 @@
 
 </section>
 
+<section>
+<title> Масштабирование и высокая доступность </title>
+
+<orderedlist>
+<listitem>
+    <para>Автоматизация роста распределённой системы.</para>
+    <para>
+        Принцип эластичности. Шардинг. Консистентное хэширование.
+        Алгоритм SUMBUR. 
+    </para>
+    <bibliolist>
+        <title>Литература</title>
+            <biblioentry>
+                <author><personname>
+                    Jason Baker, Chris Bond, James C. Corbett, JJ
+                    Furman, Andrey Khorlin, James Larson,
+                    Jean-Michel Leon, Yawei Li, Alexander Lloyd,
+                    Vadim Yushprakh
+                </personname></author>
+                <title>
+                    Megastore: Providing Scalable, Highly
+                    Available Storage for Interactive Services
+                </title>
+            </biblioentry>
+            <biblioentry>
+                <author><personname>
+                    David Karger Eric Lehman Matthew Levine Tom
+                    Leighton Rina Panigrahy Daniel Lewin
+                </personname></author>
+                <title>
+                    Consistent Hashing and Random Trees:
+                    Distributed Caching Protocols for Relieving
+                    Hot Spots on the World Wide Web
+                </title>
+            </biblioentry>
+    </bibliolist>
+</listitem>
+
+<listitem>
+    <para>
+        Модели слабой консистентности в специализированных
+        приложениях. CAP теорема.  Протокол 2PC.
+    </para>
+    <para>
+        Резервирование отелей и авиалиний. Корзина
+        покупок пользователя. Последовательные
+        коммуницирующие процессы и состояние распределённой
+        системы. Виртуальная синхрония.
+    </para>
+    <bibliolist>
+        <title>Литература</title>
+        <biblioentry>
+            <author><personname>Ken Birman</personname></author>
+            <title>A History of the Virtual Synchrony Replication Model</title>
+        </biblioentry>
+        <biblioentry>
+            <author><personname>
+                Eric Brewer
+            </personname></author>
+            <title>
+                Towards Robust Distributed Systems
+            </title>
+        </biblioentry>
+        <biblioentry>
+            <author><personname>
+                Nancy Lynch and Seth Gilbert
+            </personname></author>
+            <title>
+                Brewer's conjecture and the feasibility of consistent, available, partition-tolerant web services
+            </title>
+        </biblioentry>
+    </bibliolist>
+</listitem>
+
+<listitem>
+    <para>
+        Очереди, принципы и приёмы обработки очередей.
+    </para>
+   <para>
+        Задача банковского перевода.
+        Очереди как средство обеспечения высокой
+        доступности системы и балансировки нагрузки.
+   </para>
+    <bibliolist>
+        <title>Литература</title>
+        <biblioentry>
+            <title>Principles of Transaction Processing, Second Edition</title>
+            <author><personname>Philip A. Bernstein, Eric Newcomer</personname></author>
+        </biblioentry>
+    </bibliolist>
+</listitem>
+
+<listitem>
+    <para>
+        Репликация. Разрешение конфликтов. Векторное время.
+    </para>
+   <para>
+        Принципы работы асинхронной репликации. 
+        Задачи решаемые семи-синхронной и синхронной репликацией.
+        Включение и исключение узлов из распределённой реплицированной
+        системы без введения единой точки отказа. Мульти-мастер
+        репликация и понятие репликационного конфликта.
+   </para>
+    <bibliolist>
+        <title>Литература</title>
+        <biblioentry>
+            <title>
+                Dynamo: Amazon’s Highly Available Key-value Store
+            </title>
+            <author><personname>
+                Giuseppe DeCandia, Deniz Hastorun, Madan Jampani, Gunavardhan Kakulapati,
+                Avinash Lakshman, Alex Pilchin, Swaminathan Sivasubramanian, Peter Vosshall
+                and Werner Vogels
+            </personname></author>
+        </biblioentry>
+        <biblioentry>
+            <author><personname>
+                James C. Corbett, Jeffrey Dean, Michael Epstein, Andrew Fikes,
+                Christopher Frost, JJ Furman, Sanjay Ghemawat, Andrey Gubarev,
+                Christopher Heiser, Peter Hochschild, Wilson Hsieh, Sebastian
+                Kanthak, Eugene Kogan, Hongyi Li, Alexander Lloyd, Sergey
+                Melnik, David Mwaura, David Nagle, Sean Quinlan, Rajesh Rao,
+                Lindsay Rolig, Yasushi Saito, Michal Szymaniak, Christopher
+                Taylor, Ruth Wang, Dale Woodford
+            </personname></author>
+            <title>Spanner: Google’s Globally-Distributed Database</title>
+        </biblioentry>
+        <biblioentry>
+            <author><personname>Colin J. Fidge</personname></author>
+            <title>Timestamps in Message-Passing Systems That Preserve the Partial Ordering</title>
+        </biblioentry>
+
+
+        <biblioentry>
+            <author><personname>Jim Gray, Pat Helland, Patrick O’Neil, Dennis Shasha</personname></author>
+            <title>The Dangers of Replication and a Solution</title>
+        </biblioentry>
+        </bibliolist>
+</listitem>
+
+<listitem>
+    <para>
+        Консистентность распределённого ДКА. Paxos и Raft.
+    </para>
+   <para>
+        Paxos: разбор алгоритма. Multi-Paxos. Raft. 
+   </para>
+    <bibliolist>
+        <title>Литература</title>
+        <biblioentry>
+            <author><personname>Leslie Lamport, Robert Shostak, Marshall Pease</personname></author>
+            <title>The Byzantine Generals Problem</title>
+        </biblioentry>
+        <biblioentry>
+            <author><personname>Diego Ongaro, John Ousterhout</personname></author>
+            <title>In Search of an Understandable Consensus Algorithm</title>
+        </biblioentry>
+
+        <biblioentry>
+            <author><personname>Jun Rao, Eugene J. Shekita, Sandeep Tata</personname></author>
+            <title>Using Paxos to Build a Scalable, Consistent,
+    and Highly Available Datastore</title>
+        </biblioentry>
+        <biblioentry>
+            <author><personname>Leslie Lamport</personname></author>
+            <title>Time, clock and ordering of events in distributed systems</title>
+        </biblioentry>
+
+        <biblioentry>
+            <author><personname>Leslie Lamport</personname></author>
+            <title>Paxos Made Simple</title>
+        </biblioentry>
+
+        <biblioentry>
+            <author><personname>C.A.R. Hoare</personname></author>
+            <title>Communicating Sequential Processes</title>
+        </biblioentry>
+
+        <biblioentry>
+            <author><personname>Parisa Jalili Marandi</personname></author>
+            <title>Multi-ring paxos </title>
+        </biblioentry>
+
+    </bibliolist>
+</listitem>
+
+<listitem>
+    <para>
+        Понятие сбоя и принципы восстановления после сбоя. 
+    </para>
+   <para>
+       Оценка надёжности системы: MTTR и MTBF. Причины и частота
+       сбоя. Оценка экономической целесообразности программных
+       и аппаратных решений в контексте вероятности сбоя.
+       Протокол Gossip.
+   </para>
+    <bibliolist>
+        <title>Литература</title>
+            <biblioentry>
+                <title>
+                    Chord: A Scalable Peer-to-peer Lookup Service for Internet
+                    Applications
+                </title>
+                <author><personname>
+                    Ion Stoica, Robert Morris, David Karger, M. Frans Kaashoek, Hari Balakrishnan
+                </personname></author>
+            </biblioentry>
+            <biblioentry>
+                <author><personname>
+                    Indranil Gupta Tushar D. Chandra German S. Goldszmidt
+                </personname></author>
+                <title>On Scalable and Efficient Distributed Failure Detectors</title>
+            </biblioentry>
+            <biblioentry>
+                <author><personname>André Allavena, Alan Demers, John E. Hopcroft</personname></author>
+                <title>Correctness of a Gossip Based Membership Protocol</title>
+            </biblioentry>
+    </bibliolist>
+</listitem>
+
+</orderedlist>
+</section>
+
+<section>
+<title>Современные тенденции развития СУБД: NoSQL и NewSQL</title>
+
+<orderedlist>
+<listitem>
+    <para>
+        Обзор различных моделей данных СУБД.
+    </para>
+    <para>
+        Модель сущность-связь. Иерархическая модель.  Реляционная
+        модель. Сетевая модель.  Проблемы разнообразия, скорости
+        изменения и общего объёма данных.
+    </para>
+    <bibliolist>
+        <title>Литература</title>
+        <biblioentry>
+            <author><personname>
+             Codd, E.F.
+            </personname>
+            </author>
+            <title>
+                A Relational Model of Data for Large Shared Data Banks
+            </title>
+        </biblioentry>
+        <biblioentry>
+            <author><personname>
+                Date, C. J.; Darwen, Hugh
+            </personname>
+            </author>
+            <title>
+                Foundation for future database systems: the third
+                manifesto: a detailed study of the impact of type
+                theory on the relational model of data, including
+                a comprehensive model of type inheritance.
+            </title>
+        </biblioentry>
+        <biblioentry>
+            <author><personname>
+                Pramod J. Sadalage, Martin Fowler
+            </personname></author>
+            <title>
+                NoSQL distilled
+            </title>
+        </biblioentry>
+        <biblioentry>
+            <author><personname>
+                Michael Stonebraker, Samuel Madden, Daniel J.
+                Abadi, Stavros Harizopoulos, Nabil Hachem, Pat
+                Helland
+            </personname></author>
+            <title>
+                The End of an Architectural Era (It’s Time for a
+                Complete Rewrite)
+            </title>
+        </biblioentry>
+        <biblioentry>
+            <author><personname>Christof Strauch</personname></author>
+            <title>NoSQL Databases</title>
+        </biblioentry>
+        <biblioentry>
+            <author><personname>
+                Mikael Ronström
+            </personname></author>
+            <title>
+                Design and Modelling of a Parallel Data Server for
+                Telecom Applications
+            </title>
+        </biblioentry>
+    </bibliolist>
+</listitem>
+
+<listitem>
+    <para>
+        Модели данных в NoSQL.
+    </para>
+    <para>
+        Достоинства и недостатки реляционной модели для
+        работы с данными в Интернет.
+        Модель данных ключ-значение. Модель BigTable. Различия между
+        документом и объектом. Понятие агрегата хранения.
+        Управление схемой данных. Компромисс между
+        консистентностью и производительностью. Конкурентный доступ
+        к данным в клиент-серверной и полностью распределённой
+        архитектуре. Пример графовых задач в РСУБД.
+    </para>
+
+    <formalpara>
+    <title>Домашнее задание:</title>
+    <para>
+        Реализация библиотеки типовых
+        операций с графом на основе реляционной СУБД
+        (MySQL/PostgreSQL/etc).
+    </para>
+    </formalpara>
+    <bibliolist>
+        <title>Литература</title>
+        <biblioentry>
+            <author><personname>
+                Fay Chang, Jeffrey Dean, Sanjay Ghemawat,
+                Wilson C. Hsieh, Deborah A. Wallach Mike
+                Burrows, Tushar Chandra, Andrew Fikes, Robert
+                E. Gruber
+            </personname></author>
+            <title>
+                Bigtable: A Distributed Storage System for Structured Data
+            </title>
+        </biblioentry>
+        <biblioentry>
+            <author><personname>
+                Joe Celko
+            </personname></author>
+            <title>
+                Trees and hierarchies in SQL
+            </title>
+        </biblioentry>
+        <biblioentry>
+            <author><personname>
+                Mike Buerli
+            </personname></author>
+            <title>
+                The Current State of Graph Databases
+            </title>
+        </biblioentry>
+    </bibliolist>
+</listitem>
+
+</orderedlist>
+</section>
 
 </article>
 <!--

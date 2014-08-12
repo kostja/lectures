@@ -1,0 +1,136 @@
+1) N-way merge sort algorithm
+
+Алгоритм общего назначения
+en.wikipedia.org/wiki/Merge_sort
+
+2) Nested loop relational join algorithm
+
+Подробно разобрали на консультации. Описан в Database Systems: the complete book. en.wikipedia.org/wiki/Nested_loop_join достаточно для ответа на тройку. Для ответа на 5 необходимо
+понимать по каким принципам выбирается порядок таблиц в цикле.
+Google it!
+
+3) Consistent hashing algorithm
+
+basho.com/tag/consistent-hashing/
+Слайды (начиная с 45го — Under the hood, т.е. под капотом):
+www.lugod.org/presentations/Riak-Overload.pdf
+Не рекомендую читать оригинальную статью т.к. там
+также описывается вспомогательный алгоритм с использованием
+Merkle trees, который необходим был лишь в решении задач Akamai
+Wikipedia is OK.
+
+4) Fractional cascading algorithm
+
+MIT OCW, Advanced Algorithms, Geometric algorithms part I,
+with Eric Demaine
+Есть видео на youtube: www.youtube.com/watch?v=OK5avpGMEPQ
+Примерно с 57 минуты.
+
+5) LSM tree: algorithm, cost analysis
+O'Neil paper вполне читаемый. Проще чем на лекциях это
+нигде не объясняется.
+
+Исходный код LevelDB
+code.google.com/p/leveldb/
+Также рекомендую:
+rocksdb.org/
+
+6) Bloom filter
+Очень простой вопрос.
+en.wikipedia.org/wiki/Bloom_filter
+
+7) B-tree: algorithm, cost model, cost analysis
+
+Для понимания основ: wikipedia
+Для ответа на 5:
+www.tokutek.com/wp-content/uploads/2012/09/BenderKuszmaul-tutorial-xldb12.pdf
+tokutek.com/presentations/bender-Scalperf-9-09.pdf
+(в презентациях содержится подробный разбор проблем
+DAM модели).
+
+8) UNDO/REDO logging and recovery protocol. Стратегии NO UNDO/NO REDO. Смешанные стратегии восстановления после сбоя.
+
+Bernstein, Newcomer, глава System Recovery, часть Database Recovery Manager. Требуется понимать основные правила ведения WAL для NO UNDO/NO REDO стратегии.
+
+9) Sumbur hashing algorithm
+
+github.com/mailru/sumbur-ruby/blob/master/lib/sumbur/pure_ruby.rb
+
+10) 5 models for data consistency
+
+en.wikipedia.org/wiki/Consistency_model
+
+11) Static cache oblivious search tree — data structure, cost model, cost anaylsis
+
+MIT OCW, Eric Demaine, Memory Hierarche I — Advanced data structures
+www.youtube.com/watch?v=tizGsAuoCJs
+С 38 минуты.
+Рекомендую просмотреть лекцию полностью для понимания
+проблематики вопроса про B-trees.
+
+13) 2PL protocol, 2PL theorem and the proof
+
+Bernstein, Newcomer, Chapter 6 locking — глава
+нужна полностью для этого вопроса, 14го и 16го вопроса.
+
+14) Блокировки, таблица совместимости, специальные блокировки (update lock, intention lock, upgradeable lock), блокировки с приоритетами
+
+См. комментарий к предыдущему вопросу. В учебнике
+не разбираются pending locks, lock priorities, priority
+inversion, lock starvation. См. лекции.
+
+15) Deadlock-free алгоритмы взятия блокировок.
+
+Частично есть в Bernstein/Newcomer, «Tree locking»
+Для остального, быстрый поиск нашёл вот этот blog:
+www.justsoftwaresolutions.co.uk/threading/acquiring-multiple-locks-without-deadlock.html
+
+Тема неисчерпаема, особенно с wait-free алгоритмами.
+
+16) Estimating deadlock probability for 2PL locking
+
+См. комментарий к 14му вопросу.
+
+17) Основные принципы MVCC
+
+Bernstein, Newcomer
+
+18) Алгоритм оптимистичных блокировок для выполнения транзакций. Thomas Write Rule
+
+Bernstein, Newcomer, глава Locking
+
+19) SQL standard transaction isolation levels. Snapshot isolation.
+
+Любой учебник за авторством С.J. Date,
+wikipedia. Для ответа на 5 необходимо знать примеры проблем, которые возможны в каждом уровне изоляции (фантомы, неповтоярющиеся чтения т.д.):
+en.wikipedia.org/wiki/Isolation_%28database_systems%29#Isolation_levels
+
+20) Checkpoints. Предназначение. Fuzzy/nonquiscent checkpointing.
+
+Bernstein, Newcomer, System Recovery
+
+21) Распределённые транзакции. Протокол 2PC
+
+Bernstein, Newcomer, глава Two phase commit
+
+22) Асинхронная master-slave репликации. Statement-based и row-based репликация. Recovery from a degraded state (failover).
+
+Основы есть в Bernstein, Newcomer, Replication
+
+23) Использование векторных часов для разрешения конфилктов в асинхронной репликации
+
+Bernstein, Newcomer, глава Replication
+
+24) Paxos, принципы синхронизации состояния распределённого ДКА
+
+Paxos made simple by Leslie Lamport. Перевод на русский
+язык всей статьи есть в
+github.com/kostja/lectures/blob/master/10.paxos.txt
+
+25) Raft как алгоритм синхронной репликации
+
+ramcloud.stanford.edu/wiki/download/attachments/11370504/raft.pdf
+
+26) Gossip протокол распространения изменений в сверхбольших кластерах
+
+
