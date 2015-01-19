@@ -2,3 +2,4 @@ schedule.fo
 schedule.html
 funnelsort/sort
 funnelsort/*.o
+*.pdf

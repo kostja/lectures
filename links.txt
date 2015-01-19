@@ -4,6 +4,21 @@ http://blog.memsql.com/common-pitfalls-in-writing-lock-free-algorithms/
 
 http://www.youtube.com/watch?v=IyWOjd-oZ4o
 
+http://alasir.com/articles/cache_principles/
+
+karger skoltech
+http://www.youtube.com/channel/UCtv9PiQVUDzsT4yl7524DCg/videos
+
+https://www.youtube.com/watch?v=YbZ3zDzDnrw
+
+http://highlyscalable.wordpress.com/2012/09/18/distributed-algorithms-in-nosql-databases/
+
+http://jsensarma.com/blog/?p=55
+
+http://research.google.com/pubs/pub38125.html
+
+http://www.mysqlperformanceblog.com/2013/05/02/galera-flow-control-in-percona-xtradb-cluster-for-mysql/
+
 Time, clock and order of events in distributed systems, by Leslie Lamport
 
 Paxos made simple, by Leslie Lamport
@@ -119,3 +134,4 @@ LESLIE LAMPORT, ROBERT SHOSTAK, and MARSHALL PEASE
 
 
 http://littleriakbook.com/
+https://github.com/rxin/db-readings
