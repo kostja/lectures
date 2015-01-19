@@ -21,6 +21,108 @@
 
 <listitem>
     <para>
+        Многообразие решений для хранения данных. Модели данных
+        классических и NoSQL систем. Модели консистентности.
+        Семантика и допустимость овердрафта в интернет-приложениях.
+    </para>
+    <para>
+        Достоинства и недостатки реляционной модели для
+        работы с данными в Интернет.
+        Модель данных ключ-значение. Модель BigTable. Различия между
+        документом и объектом. Понятие агрегата хранения.
+        Управление схемой данных. Компромисс между
+        консистентностью и производительностью. Конкурентный доступ
+        к данным в клиент-серверной и полностью распределённой
+        архитектуре. Пример графовых задач в РСУБД.
+    </para>
+
+    <bibliolist>
+        <title>Литература</title>
+        <biblioentry>
+            <author><personname>
+             Codd, E.F.
+            </personname>
+            </author>
+            <title>
+                A Relational Model of Data for Large Shared Data Banks
+            </title>
+        </biblioentry>
+        <biblioentry>
+            <author><personname>
+                Date, C. J.; Darwen, Hugh
+            </personname>
+            </author>
+            <title>
+                Foundation for future database systems: the third
+                manifesto: a detailed study of the impact of type
+                theory on the relational model of data, including
+                a comprehensive model of type inheritance.
+            </title>
+        </biblioentry>
+        <biblioentry>
+            <author><personname>
+                Pramod J. Sadalage, Martin Fowler
+            </personname></author>
+            <title>
+                NoSQL distilled
+            </title>
+        </biblioentry>
+        <biblioentry>
+            <author><personname>
+                Michael Stonebraker, Samuel Madden, Daniel J.
+                Abadi, Stavros Harizopoulos, Nabil Hachem, Pat
+                Helland
+            </personname></author>
+            <title>
+                The End of an Architectural Era (It’s Time for a
+                Complete Rewrite)
+            </title>
+        </biblioentry>
+        <biblioentry>
+            <author><personname>Christof Strauch</personname></author>
+            <title>NoSQL Databases</title>
+        </biblioentry>
+        <biblioentry>
+            <author><personname>
+                Mikael Ronström
+            </personname></author>
+            <title>
+                Design and Modelling of a Parallel Data Server for
+                Telecom Applications
+            </title>
+        </biblioentry>
+        <biblioentry>
+            <author><personname>
+                Fay Chang, Jeffrey Dean, Sanjay Ghemawat,
+                Wilson C. Hsieh, Deborah A. Wallach Mike
+                Burrows, Tushar Chandra, Andrew Fikes, Robert
+                E. Gruber
+            </personname></author>
+            <title>
+                Bigtable: A Distributed Storage System for Structured Data
+            </title>
+        </biblioentry>
+        <biblioentry>
+            <author><personname>
+                Joe Celko
+            </personname></author>
+            <title>
+                Trees and hierarchies in SQL
+            </title>
+        </biblioentry>
+        <biblioentry>
+            <author><personname>
+                Mike Buerli
+            </personname></author>
+            <title>
+                The Current State of Graph Databases
+            </title>
+        </biblioentry>
+    </bibliolist>
+</listitem>
+
+<listitem>
+    <para>
         Классические алгоритмы организации даных для двухуровневой
         памяти.
     </para>
@@ -54,23 +156,13 @@
     <para>
         Понятие cache-oblivious алгоритма.  Базовые
         cache-oblivious алгоритмы. Понятие write amplification.
-        Фрактальные деревья. LSM деревья.  Bloom фильтры.
+        Фрактальные деревья. 
     </para>
     <formalpara><title>Домашнее задание:</title>
         <para>Реализовать библиотеку для хранения данных на диске.</para>
      </formalpara>
     <bibliolist>
         <title>Литература</title>
-        <biblioentry>
-            <author><personname>Justin Sheehy, David Smith</personname></author>
-            <title>Bitcask A Log-Structured Hash Table for Fast Key/Value Data</title>
-        </biblioentry>
-
-        <biblioentry>
-            <author><personname>Patrick O'Neil , Edward Cheng, Dieter Gawlick, Elizabeth O'Neil</personname></author>
-            <title>The Log-Structured Merge-Tree (LSM-Tree)</title>
-        </biblioentry>
-
         <biblioentry>
             <author><personname>Harald Prokop</personname></author>
             <title>Cache-Oblivious Algorithms</title>
@@ -88,6 +180,33 @@
     </bibliolist>
 </listitem>
 
+<listitem>
+    <para>
+        Современные специализированные алгоритмы хранения данных
+        в двухуровневой памяти (часть 2).
+    </para>
+    <para>
+        LSM деревья. Блум-фильтры. Двухуровневые деревья. 
+    </para>
+    <bibliolist>
+        <title>Литература</title>
+        <biblioentry>
+            <author><personname>Justin Sheehy, David Smith</personname></author>
+            <title>Bitcask A Log-Structured Hash Table for Fast Key/Value Data</title>
+        </biblioentry>
+
+        <biblioentry>
+            <author><personname>Patrick O'Neil , Edward Cheng, Dieter Gawlick, Elizabeth O'Neil</personname></author>
+            <title>The Log-Structured Merge-Tree (LSM-Tree)</title>
+        </biblioentry>
+
+        <biblioentry>
+            <author><personname>Burton H. Bloom</personname></author>
+            <title>Space/time trade-offs in hash coding with allowable errors
+            </title>
+        </biblioentry>
+    </bibliolist>
+</listitem>
 <listitem>
     <para>
         Кэширование как механизм повышения эффективности системы. 
@@ -166,16 +285,12 @@
 
 <listitem>
     <para>
-      Свойства транзакции. Понятие консистентности данных.  
-      Модели консистентности данных.
+      Транзакции. Принципы ACID транзакционной обработки данных.
+      Реализация подсистемы хранения с использованием журнала.
     </para>
     <para>
-        Принцип двойной записи. Запрет на исправления. 
-        Семантика и допустимость овердрафта в
-        интернет-приложениях. Понятие истории изменений.
-        Транзакции в распределённых системах.
-        Виды аномалий при конкурентном доступе к данным.
-        Пессимистичные блокировки. 2PL теорема.
+        Принцип двойной записи.  Понятие истории изменений.
+        Стратегии NO UNDO, NO REDO. Стратегии STEAL, NO STEAL.
     </para>
     <bibliolist>
         <title>Литература</title>
@@ -199,8 +314,30 @@
 
 <listitem>
     <para>
-        Управление конкурентным доступом к данным на основе
-        иерархии блокировок.
+      Использование блокировок для управления транзакциями.
+      Понятие расписания. Теорема 2PL.
+    </para>
+    <para>
+        Понятие расписание. Сериальные и сериализуемые расписания.
+        Классы расписаний.  Теорема 2PL: формулировка. Построение
+        графа зависимостей транзакций. Доказательство.
+    </para>
+    <bibliolist>
+        <title>Литература</title>
+        <biblioentry>
+            <author><personname>
+                Gerhard Weikum, Gottfried Vossen
+            </personname></author>
+            <title>Transactional Information Systems: Theory,
+            Algorithms, and the Practice of Concurrency Control and
+            Recovery </title>
+        </biblioentry>
+    </bibliolist>
+</listitem>
+
+<listitem>
+    <para>
+        Управление блокировками. 
     </para>
     <para>
         Иерархические блокировки. Специальные блокировки. Дедлоки.
@@ -223,12 +360,11 @@
 
 <listitem>
     <para>
-        Управление конкурентным доступом к данным на основе
-        временных меток.
+        Оптимистичные алгоритмы управления транзакциями.
     </para>
     <para>
         Понятие оптимистичного управления транзакциями.
-        Временные метки. Правила установки меток.
+        Валидация.  Временные метки. Правила установки меток.
         Протокол многоверсионного управления транзакциями.
     </para>
     <bibliolist>
@@ -245,31 +381,19 @@
     </bibliolist>
 </listitem>
 
-<listitem>
-    <para>
-        Проблемы физического размещения данных при двухуровневом хранении.
-    </para>
-    <para>
-        Фрагментация. Управление разделами.
-        Назначение сегментов и экстентов.
-        UNDO/REDO логирование.  Восстановление после сбоя.
-        Управление кэшем страниц. Стратегии Steal/No Steal.
-    </para>
-</listitem>
-
 </orderedlist>
 
 </section>
 
 <section>
-<title> Масштабирование и высокая доступность </title>
+<title>Масштабирование и высокая доступность</title>
 
 <orderedlist>
 <listitem>
-    <para>Автоматизация роста распределённой системы.</para>
+    <para>Горизонтальное масштабирование СУБД</para>
     <para>
         Принцип эластичности. Шардинг. Консистентное хэширование.
-        Алгоритм SUMBUR. 
+        Алгоритм Guava. 
     </para>
     <bibliolist>
         <title>Литература</title>
@@ -301,14 +425,12 @@
 
 <listitem>
     <para>
-        Модели слабой консистентности в специализированных
-        приложениях. CAP теорема.  Протокол 2PC.
+        Введение в распределённые системы. Протокол 2PC.
     </para>
     <para>
-        Резервирование отелей и авиалиний. Корзина
-        покупок пользователя. Последовательные
-        коммуницирующие процессы и состояние распределённой
-        системы. Виртуальная синхрония.
+        Понятие распределённой системы. Свойства Safety и Liveness.
+        Дилемма двух генералов. Результат Фишера-Линча-Паттерсона.
+        Протокол 2PC. Возможные оптимизации.
     </para>
     <bibliolist>
         <title>Литература</title>
@@ -331,24 +453,6 @@
             <title>
                 Brewer's conjecture and the feasibility of consistent, available, partition-tolerant web services
             </title>
-        </biblioentry>
-    </bibliolist>
-</listitem>
-
-<listitem>
-    <para>
-        Очереди, принципы и приёмы обработки очередей.
-    </para>
-   <para>
-        Задача банковского перевода.
-        Очереди как средство обеспечения высокой
-        доступности системы и балансировки нагрузки.
-   </para>
-    <bibliolist>
-        <title>Литература</title>
-        <biblioentry>
-            <title>Principles of Transaction Processing, Second Edition</title>
-            <author><personname>Philip A. Bernstein, Eric Newcomer</personname></author>
         </biblioentry>
     </bibliolist>
 </listitem>
@@ -403,10 +507,10 @@
 
 <listitem>
     <para>
-        Консистентность распределённого ДКА. Paxos и Raft.
+        Консистентность распределённого ДКА. Алгоритм Paxos.
     </para>
    <para>
-        Paxos: разбор алгоритма. Multi-Paxos. Raft. 
+        Paxos: разбор алгоритма. Multi-Paxos.
    </para>
     <bibliolist>
         <title>Литература</title>
@@ -449,13 +553,10 @@
 
 <listitem>
     <para>
-        Понятие сбоя и принципы восстановления после сбоя. 
+        Задача репликации журнала БД. Алгоритм Raft.
     </para>
    <para>
-       Оценка надёжности системы: MTTR и MTBF. Причины и частота
-       сбоя. Оценка экономической целесообразности программных
-       и аппаратных решений в контексте вероятности сбоя.
-       Протокол Gossip.
+        Raft: разбор алгоритма. Задача смены конфигурации. Оптимизации.
    </para>
     <bibliolist>
         <title>Литература</title>
@@ -478,140 +579,13 @@
                 <author><personname>André Allavena, Alan Demers, John E. Hopcroft</personname></author>
                 <title>Correctness of a Gossip Based Membership Protocol</title>
             </biblioentry>
+
     </bibliolist>
 </listitem>
 
 </orderedlist>
 </section>
 
-<section>
-<title>Современные тенденции развития СУБД: NoSQL и NewSQL</title>
-
-<orderedlist>
-<listitem>
-    <para>
-        Обзор различных моделей данных СУБД.
-    </para>
-    <para>
-        Модель сущность-связь. Иерархическая модель.  Реляционная
-        модель. Сетевая модель.  Проблемы разнообразия, скорости
-        изменения и общего объёма данных.
-    </para>
-    <bibliolist>
-        <title>Литература</title>
-        <biblioentry>
-            <author><personname>
-             Codd, E.F.
-            </personname>
-            </author>
-            <title>
-                A Relational Model of Data for Large Shared Data Banks
-            </title>
-        </biblioentry>
-        <biblioentry>
-            <author><personname>
-                Date, C. J.; Darwen, Hugh
-            </personname>
-            </author>
-            <title>
-                Foundation for future database systems: the third
-                manifesto: a detailed study of the impact of type
-                theory on the relational model of data, including
-                a comprehensive model of type inheritance.
-            </title>
-        </biblioentry>
-        <biblioentry>
-            <author><personname>
-                Pramod J. Sadalage, Martin Fowler
-            </personname></author>
-            <title>
-                NoSQL distilled
-            </title>
-        </biblioentry>
-        <biblioentry>
-            <author><personname>
-                Michael Stonebraker, Samuel Madden, Daniel J.
-                Abadi, Stavros Harizopoulos, Nabil Hachem, Pat
-                Helland
-            </personname></author>
-            <title>
-                The End of an Architectural Era (It’s Time for a
-                Complete Rewrite)
-            </title>
-        </biblioentry>
-        <biblioentry>
-            <author><personname>Christof Strauch</personname></author>
-            <title>NoSQL Databases</title>
-        </biblioentry>
-        <biblioentry>
-            <author><personname>
-                Mikael Ronström
-            </personname></author>
-            <title>
-                Design and Modelling of a Parallel Data Server for
-                Telecom Applications
-            </title>
-        </biblioentry>
-    </bibliolist>
-</listitem>
-
-<listitem>
-    <para>
-        Модели данных в NoSQL.
-    </para>
-    <para>
-        Достоинства и недостатки реляционной модели для
-        работы с данными в Интернет.
-        Модель данных ключ-значение. Модель BigTable. Различия между
-        документом и объектом. Понятие агрегата хранения.
-        Управление схемой данных. Компромисс между
-        консистентностью и производительностью. Конкурентный доступ
-        к данным в клиент-серверной и полностью распределённой
-        архитектуре. Пример графовых задач в РСУБД.
-    </para>
-
-    <formalpara>
-    <title>Домашнее задание:</title>
-    <para>
-        Реализация библиотеки типовых
-        операций с графом на основе реляционной СУБД
-        (MySQL/PostgreSQL/etc).
-    </para>
-    </formalpara>
-    <bibliolist>
-        <title>Литература</title>
-        <biblioentry>
-            <author><personname>
-                Fay Chang, Jeffrey Dean, Sanjay Ghemawat,
-                Wilson C. Hsieh, Deborah A. Wallach Mike
-                Burrows, Tushar Chandra, Andrew Fikes, Robert
-                E. Gruber
-            </personname></author>
-            <title>
-                Bigtable: A Distributed Storage System for Structured Data
-            </title>
-        </biblioentry>
-        <biblioentry>
-            <author><personname>
-                Joe Celko
-            </personname></author>
-            <title>
-                Trees and hierarchies in SQL
-            </title>
-        </biblioentry>
-        <biblioentry>
-            <author><personname>
-                Mike Buerli
-            </personname></author>
-            <title>
-                The Current State of Graph Databases
-            </title>
-        </biblioentry>
-    </bibliolist>
-</listitem>
-
-</orderedlist>
-</section>
 
 </article>
 <!--
