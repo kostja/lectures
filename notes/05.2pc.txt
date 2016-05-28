@@ -1,0 +1,186 @@
+Let's begin what is serializable execution?
+
+What's the principle behind UNDO based recovery?
+
+The effect is the same as executing transactions in sequence.
+
+The most popular mechanism for serial execution is locking. 
+
+The intuition behind locking is that it avoids interfereence between
+transaction by setting conflicting locks. 
+
+Now let's take a concrete example:
+
+write-read conflict
+
+
+x = x + y  
+
+y = 2 x
+
+(formulate types of conflicts)
+write after read conflict
+
+demonstrate a non-serializable schedule
+
+r1[x]w1[y]r2[x]w2[y]
+
+doesn't have the same effect.
+serial executions: t1 t2 or t2 t1
+
+Two-phase-locking theorem:
+
+if all transactions in an execution are two-phase locked, then 
+    execution is serializable.
+
+Proof by building a DAG, and proving that it won't have a loop
+in it if 2pl is used.
+
+QQQ: is 2pl minimal necessary thing to make the DAG acyclic?
+
+so let's formalize this
+
+An execution history is a sequence of read, write, commit operations
+
+One transaction history is considered equivalent to the other if
+in it all transactions which perform conflicting operations
+the same data items are in the same relative order.
+
+one execution history is considered equivalent to the other,
+if in it all operations (!) which perform conflicting operations
+the same object are in the same relative order.
+
+A serial history is a history in which operations of different
+transactions are not interleaved.
+
+Serializability theorem is thus a theorem about equivalence of
+history to some serial history.
+
+Let's model a history of transactions using a DAG.
+
+Each transaction is a node on the DAG. If transaction A 
+has a conflicting operation with transaction B, then there
+is an edge from A to B (provided A operation executed before B operation).
+
+r1[x] r2[x] w1[x] r3[x] w2[y] c2 w1[y] c1 w3[x] c3
+
+Example of a serializable but not conflict-serializable schedule:
+
+w1[y] w1[x] w2[y] w2[x] w3[x] - serial schedule
+
+w1[y] w2[y] w2[x] w1[x] w3[x] - serializable but not conflict-serializable
+schedule
+
+Now this history is equivalent to the following serial transaction
+history : 
+
+2 1 3
+
+So, to prove 2pl theorem we need to do 2 things:
+
+- prove that for every acyclic DAG we can come up with an 
+equivalent serial history
+
+- prove that 2pl leads to an acyclic dag.
+
+
+Now this history is equivalent to the following serial transaction
+history : 
+
+2 1 3
+
+So, to prove 2pl theorem we need to do 2 things:
+
+- prove that for every acyclic DAG we can come up with an 
+equivalent serial history
+
+- prove that 2pl leads to an acyclic dag.
+
+1. We prove by construction. Given an acyclic DAG we choose a 
+node which has no incoming edges. Put it first in the history 
+and remove from the DAG. Repeat the process until the graph is
+empty. By definition removing a node from the DAG will keep the
+DAG acyclic. 
+
+A history constructed this way will preserve order between 
+conflicting transactions, so will be equivalent to the original
+history.
+
+
+2. Now, suppose it doesn't. it means there is a loop in a DAG.
+It proves that a lock on some item x was taken by t2 before a lock
+on item x was taken by t1, and a conflicting lock on  y was taken by t1
+before a conflicting lock was taken on y on t2. But if x lock 
+was taken before, it would have prevented t2 from taking the lock
+
+Conclusion: a loop in a DAG means 2pl wasn't followed.
+----------------------------------------------------------------------
+
+Implementation
+---------------
+
+Lock granularity, multigranularity locking, lock escalation and lock
+conversion, hierarchical locks
+lock table
+lock starvation
+deadlock, deadlock avoidance, deadlock detection: wait-based, timeout-based,
+victim selection (the fattest, the fewest number o focks, closed
+the dedlock cycle), distributed deadlock detection
+
+lock thrashing - partially completed transactions contribute to the
+likelyhood that other transactions will become blocked.
+
+ N transactions, each requests K locks in its lifetime, 
+ on average NK/2 active locks, D lockkable data items
+
+ Probability of conflict is NK/2/D == NK / 2D, sometime during
+ transaction lifetime is NK^2 / 2D
+
+ Probability of deadlock: 
+
+ NK^4/4D^2
+
+ use tickets to avoid this.
+
+store locks in the lock table or store them in the object itself?
+
+--------------------------------------------------------------------
+
+Before we begin
+---------------
+
+Don't recover:
+    - checkpointing
+    - stateless operation
+
+Impossible to recover:
+- a notion of idempotent operation and non-idempotent operation:
+
+Types of recovery
+-----------------
+
+   printing a check - non-idempotent operation
+   repeating a transaction from write ahead log - an idempotent
+   operation
+
+   Handling an idempotent operation is a topic for queueing theory.
+
+- taransaction-based recovery: why transactio isolation
+is necessary not only for consistency, but also for recoverabiilty
+-> follow the demands on the locking model
+
+Interaction of recovery and locking
+----------------------------------
+- demands on the locking model
+
+
+Basic recovery algorithms
+-------------------------
+
+Shadow paging
+
+Checkpointing
+-------------
+
+Quiscent checkpointing
+Non-quiscent (fuzzy) checkpointing.

@@ -1,0 +1,114 @@
+The two phase commit protocol
+-----------------------------
+
+Assumtions of the two phase commit protocol: 
+
+1. N transactional systems. An abort is easy: abort on all systems
+
+2. T is a distributed transaction. Parts of T are on N systems.
+Each system can commit (abort too) its part of T.
+
+3. There is one selected coordinator, selection of the coordinator
+is out of the scope of the protocol.
+
+4. The coordinator ensures that 2pc is started only after
+no parts of the transactions are still being executed on one of
+the systems (i.e. 2pc gets invoked only when each system is ready
+to commit/abort).
+
+5. Each participant only has non-byzantine failures.
+
+
+----------------------------------------------------------------
+The protocol
+------------
+
+Phase 1: request-to-prepare - N messages, N responses
+Phase 2: commit/abort - N messages, N respones
+
+2 strictly synchronous rounds of messages, 4N messages.
+
+What "prepare" phase actually means
+-----------------------------------
+All of transactions's after-images in one way or the other are in
+the stable storage.
+
+Issues
+-------
+
+1. One of the participants doesn't respond - either to Phase 1 or to
+Phase 2. What should coordinator do? 
+
+In phase 1 - we can simply set a timeout, and treat lack of
+response as NO response. The participant still has to figure
+out what happened when it recovers.
+
+2. The participant dies and recovers - in phase 1, in phase 2.
+What should coordinator do? What should the participant do?
+
+2. The coordinator dies and recovers - after in phase 1, in phase 2.
+What to do?
+
+Note, that link failure is indistinguishable from process failure 
+- we just don't get a response from the other party (sometimes
+system failure is visible as a message on the channel though).
+
+A participant is said to be 'uncertain' between PREPARE and COMMIT.
+The coordinator is never uncertain, since it gets to decide what
+to do. Uncertainty is a bad property of the two-phase commit. 
+Worst case: the coordinator fails while a participant is uncertain, 
+the participant is stuck until there is a new coordinator.
+
+Theorem 1. For every possible commit protocol (not jsut two-phase commit)
+a communciation failure can cause a participant to become blocked.
+
+This also means that if an uncertain participant fails,
+when it recovers, the coordinator may be down. It can not
+independently recover.
+
+Theorem 2. No commit protocol can guarantee independent recovery
+of failed participants.
+
+Solutions: a) heuristic decision b) contact other participants.
+Three phase commit avoids blocking if the system has no 
+communication failures. It's 3 phase,  so 3 rounds.
+
+The basic approach to guide recovery is WAL all messages
+before executing them. Then each participant/coordinator
+at least knows on what page it with this transaction
+when it recovers. 
+
+So, the coordinator should write START 2PC with a
+list of participants before it starts 2PC. It has to 
+be eager since otherwise one of participants cna get
+stuck in uncertainty forever. 
+
+The same is true about the commmit record in the log.
+So the coordinator is always eager.
+
+The participant also has to eagerly write PREPARED
+before it responds with PREPARED. Otherwise
+it may abort the transaction after it fails and recovers. 
+
+It has to eagerly write COMMIT/ABORT records when 
+it receives them, since once it sends DONE it gets
+permission to the coordinator to forget the transaction.
+
+This gives 4 possible states of coordinator wrt a transaction,
+and 3 possible states of participant.
+We now can define what each party does in each state.
+
+Termination protocol is what participant does if it was in
+uncertain state at the time of failure.
+
+---------------------------------------------------------------
+Optimzations
+------------
+
+1. Avoid the tailing prepare.
+2. Don't wait, as a participant, on the response to some messages.
+3. Coordinator is a participant, it's just a role.
+
+Implementation issues
+---------------------
+Keeping track of "stuck" transactions.

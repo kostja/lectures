@@ -1,0 +1,44 @@
+- Динамо задумывалась как полностью симметричная система
+На практике даже распределённые алгоритмы дают более высокую 
+производительность если, в отсутствие аварий, таких как 
+network partitioning или node failure, есть distinguished leader,
+который принимает решение в группе.
+
+http://damienkatz.net/2013/05/dynamo_sure_works_hard.html
+
+If Dynamo used a traditional quorum approach it would be
+unavailable during server failures and network partitions, and
+would have reduced durability even under the simplest of failure
+conditions.
+
+
+Business logic specific reconciliation: This is a popular use
+case for Dynamo. Each data object is replicated across
+multiple nodes. In case of divergent versions, the client
+application performs its own reconciliation logic. The
+shopping cart service discussed earlier is a prime example of
+this category. Its business logic reconciles objects by
+merging different versions of a customer’s shopping cart.
+
+Timestamp based reconciliation: This case differs from the
+previous one only in the reconciliation mechanism. In case of
+divergent versions, Dynamo performs simple timestamp
+based reconciliation logic of “last write wins”; i.e., the object
+with the largest physical timestamp value is chosen as the
+correct version. The service that maintains customer’s
+session information is a good example of a service that uses
+this mode.
+
+•
+High performance read engine: While Dynamo is built to be
+an “always writeable” data store, a few services are tuning its
+quorum characteristics and using it as a high performance
+read engine. Typically, these services have a high read
+request rate and only a small number of updates. In this
+configuration, typically R is set to be 1 and W to be N. For
+these services, Dynamo provides the ability to partition and
+replicate their data across multiple nodes thereby offering
+incremental scalability. Some of these instances function as
+the authoritative persistence cache for data stored in more
+heavy weight backing stores. Services that maintain product
+catalog and promotional items fit in this category.

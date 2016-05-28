@@ -1,0 +1,7 @@
+Bigtable
+does not support a full relational data model; instead, it
+provides clients with a simple data model that supports
+dynamic control over data layout and format, and al-
+lows clients to reason about the locality properties of the
+data represented in the underlying storage.
+

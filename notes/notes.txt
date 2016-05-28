@@ -1,0 +1,1584 @@
+1. Цель курса
+-------------
+
+Современная расшифровка аббревиатуры NoSQL - Not Only SQL. 
+Что значит Not Only? Как определяется это множество? 
+
+В этом курсе этот мир определяется как мир систем управления
+базами данных. Все системы непосредственно накапливающие информацию и
+предоставляющие доступ к ней так или иначе подпадают под это определение.
+
+Задача курса - дать специалисту разрабатывающему более масштабные
+системы пространство классификации, топологию, для того чтобы
+ориентироваться в мире СУБД решений.
+
+Так почему же NoSQL? NoSQL сегодня наиболее разнообразный, и
+наиболее сложный в классификации, и наиболее динамично развивающийся
+мир СУБД, и поэтому представляет наибольшую когнитивную проблему. 
+
+Одной из уникальных составляющих курса я бы назвал введённое пространство
+классификации современных СУБД систем. Пространство 
+состоит из трёх размерностей:
+
+- модель данных - от структурированных данных к ненормализованным
+  данным, таким как JSON
+- модель консистентности данных - от ACID к BASE
+- фундаментальные принципы и алгоритмы хранения данных,
+  положенные в основы системы - от простого логирования к
+  column-store и graph store.
+
+Для понимания многообразий NoSQL решений необходимо осознавать, что
+пространство решений не непрерывно - помимо ограничений,
+сформированных проблемами и задачами, решаемыми СУБД, выбор точки
+в одной из размерностей "мотивирует" разработчика СУБД выбрать
+наиболее связанные с ней решения и принципы из других размерностей. 
+
+Действительно, при анализе существующих решений мы увидим,
+например, что документно-ориентированные СУБД часто выбирают 
+eventual consistency и атомарность хранения, без поддержки
+сложных транзакций. Графовые и реляционные СУБД, предполагающие
+высокую степень декомпозиции данных, наоборот, часто предоставляют
+ACID транзакции.
+
+Похожим образом in-memory СУБД ориентированы на более простые
+модели данных, т.к. память до сих пор существенно дороже чем 
+диск.
+
+2. Причины возникновения NoSQL движения.
+----------------------------------------
+
+Для понимания природы NoSQL наиболее важными представляются
+следующие причины (debatable)
+
+- недостатки реляционных систем
+- решение задач обработки данных на которые реляционные, объектные
+и XML системы не были рассчитаны
+- реструктуризация IT рынка
+
+Остановимся на этих причинах подробнее. 
+
+2a. Недостатки реляционных систем
+
+Недостатки реляционных систем - бурная тема для обсуждений начиная с начала
+1990х годов  - достаточно вспомнить Object-Oriented Database System
+manifesto by Atkinson et al, и Third Manifesto by Date/Darwin. Это и
+несоответствие реляционной модели модели объектно-ориентированной (так
+называемый object-relational impedance mismatch), и недостаточная
+"реляционность" языка SQL, и "ориентированность" стандарта SQL во 
+множестве аспектов (уровни изоляции транзакций, APIs, Unicode support, 
+object extentions, и пр. пр.) на интересы одного вендора.
+
+Но, как показывает судьба объектных систем, эти недостатки оказались явно
+недостаточны для того чтобы свергнуть SQL и реляционные системы с позиции
+лидерства в индустрии СУБД. В самом деле, многие популярные объектные
+системыиз 90х, такие как InterSystems Cache позиционируют себя сейчас как
+NoSQL решения, и имеют лишь нишевые применения, такие как ИТМ
+(информационные технологии в медицине).
+
+Более критичными аспектами реляционных систем (но не всегда реляционной
+модели!) принято считать следующее:
+
+- rigidity of schema design and change.  Реляционные системы зародились во
+времена доминирования waterfall model в инженерии ПО, т.е. рассчитывались на
+тщательную проработку каждого аспекта функционирования системмы. Одним из
+таких аспектов был изменение схемы данных. Область применения реляционных
+систем, таких как banking, часто предполагала возможность частичного
+downtime, то есть задача online schema change не стояла остро до 2000х гг. и
+начала применения реляционных баз в веб проектах.
+
+- архитектура вертикального масштабирования. Большая часть реляционных
+систем, опять же, были рассчитаны на клиент-серверное применение с
+вертикальным масштабированием серверных мощностей. MySQL, как первая
+система поддерживающая репликацию и горизонтальноое масштабирование 
+получила широкое распространение в мире Web именно благодаря этому.
+
+Радикальные изменения в архитектуре аппаратного обеспечения обогнали
+продукты СУБД на два поколения: процессы сменились тредами, а модель
+тредов и критических секций, в свою очередь, lock-free структурами данных.
+"Типичный процессор для СУБД", в свою очередь, сменился на кластер
+однотипных машин с малым числом процессоров, а кластер машин с малым числом процессоров - кластером машин с 24-100 процессорами на каждой.
+Таким образом, производительность РСУБД даже на single-server
+системе стала неадекватной (performance of a single server problem).
+
+Фактически, в силу радикального изменения как оборудования так и 
+*начальных* требований к возможностям СУБД в 2000х открылось "окно"
+в результате которого на рынок получило возможность выйти множество
+систем.
+
+- неготовность к горизонтальному масштабированию (scale-out data) 
+- как с точки зрения традиционной теории нормализации (и как следствии
+необходимости во вторичных ключах, которые не шардятся), так и вследствие
+неготовности к задачам нового рынка, так и вследствие наследия
+клиент-серверной архитектуры, с централизованной обработкой запросов на
+сервере и простым клиентом. (Для эффективной реализации шардинга и
+распределённых запросов необходим "умный" клиент).  Подробнее этот момент
+станет понятен после обсуждения моделей данных NoSQL СУБД
+
+Однако не стоит переоценивать проблему горизонтального масштабирования: 
+масштабироваться дожно веб приложение, что не всегда означает
+необходимость масштабирования на уровне СУБД
+
+2b. Новые задачи возникшие перед СУБД
+
+Доступность оборудования для хранения дала возможность
+в коммерческих целях хранить и обрабатывать совершенно
+иные объёмы данных, объёмы недоступные ни одной вертикально
+масштабируемой системе. Для сравнения, 
+
+Эти задачи можно в целом обозначить как задачи Big Data,
+характеризуемые 3мя V- velocity, variety, volume
+
+Здесь роль также сыграла закрытость большинства коммерческих продуктов. 
+Бизнес модель большинства интернет-компаний не позволяет иметь
+лицензионные отчисления per cpu/per code/per node - часто для простейшего
+с минимальной прибыльностью необходимо использовать десятки и сотни узлов.
+таким образом, выбор мог быть осуществлён только среди открытых систем
+(MySQL, PostgreSQL), которые мгновенно были "захлёстнуты" волной
+интереса, ни одна из которых не была приспособлена к
+горизонтальному масштабированию.
+
+Также следует упомянуть что SQL системы, созданные в первую очередь
+для обработки финансовых транзакций и поддержки accounting
+не были рассчитаны на Amazon Shopping Basket сценарий, когда 
+Availability goes before Consistency или необходима отказоустойчивая
+работа в условиях геораспределённого data center.
+
+Таким образом возникли движения 2b.1. Big Data, Eventual consistency
+(Amazon Shopping Basket), нишевые применения (Graph databases).
+
+Efficiency : The system needs to function on a commodity hardware
+infrastructure. In Am azon’s platform, services have stringent latency requi
+rements which are in general measured at the 99.9 th percentile of the
+distribution. Given that state access plays a crucial role in service
+operation the storage system must be capable of meeting such stringent SLAs
+(see
+
+2c. Рынок применения СУБД значительно расшириллся. Фактически, в 2013 
+СПО обязано быть СПО - системное программное обеспечение обязано быть 
+свободным, чтобы снискать минимальную популярность и получить рынок.
+Парадигма отношения к СУБД как к сложному системному продукту разрабатываемому по принципам "one size fits all", сменилась на парадигму 
+polyglot persistence - когда для решения каждой задачи хранения данных
+выбирается наиболее подходящий под эту задачу инструмент.
+
+Надо понимать что при наличии NoSQL движения, многие крупные компании
+по-прежнему успешно используют MySQL и др. реляционные СУБД как
+своё основное хранилище (Facebook, Badoo, много -Google, even Amazon
+for many parts of its infrastructure)
+
+При анализе причин возникновения NoSQL не следует забывать
+также исторические факторы.
+
+3. Обзор текущего многообразия мира СУБД
+----------------------------------------
+
+Слайд 1.
+
+О чём мы не будем говорить сегодня.
+
+Пространство решений для хранения управления данными огромно. 
+Я намеренно исключил из этого доклада big data явление и решения
+для big data - это тоже NoSQL, но это новая ниша для которой
+не существовало ни у кого до этого решений. Тесное взаимодействие
+Сloudera с Oracle Corp и Intel Corp говорит о том, что это уже
+сформировавшаяся ниша, которую настала пора осваивать всем.
+
+Слайд 2. 
+
+Для анализа оставшевсегося пространства, я предлагаю 
+концептуальную систему координаат состоящую из 3х размерностей.
+
+Я утверждаю что каждоё существующее NoSQL решение описывается
+точкой в этой системе координат, и рекомендую всем, кто пытается
+разобраться в многообразоном рынке MySQL взять её на вооружение.
+
+Давайте кратко пройдёмся по каждой размерности:
+
+1. Хранение данных - это компромисс между скоростью сохранения и скоростью
+   доступа, скоростью запросов и типами запросов.
+
+Пора останавливать меня и задавать вопросы!
+
+
+2. Консистентность данных - отражает многообразие use cases
+которые уже вышли за пределы OLTP систем
+
+3. Модели данных - отражает как удобство использования так и взаимодействие
+со всеми остальными пространствами, т.к. модель данных диктует целый
+ряд ограничений как на алгоритмы хранения так и на алгоритмы поддержки
+консистентности данных.
+
+Слайд 3.
+---------
+
+Прежде чем мы начнём разбираться в NoSQL системах, давйте посмотрим
+поподробнее на проблемы реляционных систем. Почему они не смогли занять новые
+ниши, что им успешно удавалось делать в течение 40 лет?
+
+Совпал *по времени* целый ряд факторов, основные я постараюсь сейчас
+перечислить:
+
+- в реляционной модели вы проектируте приложение в водопадном стиле
+- мир больше не такой.
+
+- вы сообщаете СУБД всё о своём приложении - вы больше не знаете всего
+
+- они не готовы к тому что ыэто изменится - это на самом деел просто
+ проблема реализации.
+
+- нормализация плохо распределяется на кластер
+
+- консистентность - реляционные системы поддерживают только ACID, 
+а как мы будем говорить, периодически вам не нужен распределённый
+ACID, он чрезвычайно дорог 
+
+- расширился рынок СУБД, появилась возможность создавать специализированные
+  решения
+
+- архитектура клиент-сервер не подходит для современного железа, системы
+созданные для вертикального масштабирования плохо масштабируются
+горизонтально.
+
+Надо сказать что NoSQL системы отвергли не только недостатки SQL,
+но и их преимущества и поэтому вы иногда вынуждены жрать кактус.
+
+Слайд 4.
+---------
+
+Давайте вернёмся теперь к нашей системе координат,
+рассмотрим модели данных NoSQL и посмотрим какие нерешённые проблемы
+они решают.
+
+У нас есть: (см. слайд).
+
+
+Слайд 5.
+
+Давайте попробуем разобраться во всём этом чуть подробнее, рассмотрим
+модели данных.
+
+
+Слайд 14.
+--------
+
+Вот такое многообразие юзе кейсов с точки зрения моделей данных.
+Так что же с моделью консистентности.
+
+Из дальнейшего рассмотрения давайте исключим графовые базы:
+- нет распределённых до сих пор
+- распределённые - отдельная ниша и рынок, только крупные игроки 
+- похожи на реляционки
+
+
+Агрегат легко кластеризовать, по тому или иному принципу размазать
+по кластеру. 
+
+Агрегат часто обновляется целиком. 
+
+Но почему оказываются невостребованными транзакции для таких баз?
+
+Давайте рассмотрим классический сценарий работы через веб.
+
+Таким образом, мы имеем два взгляда на консистентность: 
+логическая консистентность и физическая консистентность, и часто нет
+необходимости в требованиях к физической консистентности если
+не требуется серьёзная физическая.
+
+Решение часто принимается на бизнес уровне, давайте рассмотрим
+три специфических кейса.
+
+(кейсы).
+
+0. What we're not going to talk about: big data products, Hadoop, Elliptics
+
+1. Three dimensions.
+
+Для того
+
+3. Three problems of relational databases.
+
+
+2. Dimension Data Model - how it all started, history of NoSQL
+
+How is XML data model differnet from JSON/Document store?
+
+You have a schema.
+
+Implicit schema.
+
+Nothing is perfect - rearranging the data is straightforward.
+
+Aggregate orientation is an advantage if you want a quick 
+put/get of entire aggregate. It's a disadvantage if there is
+more than one way in which you slice & dice your data.
+
+Classical normalization problem. Map/reduce jobs.
+
+4. Dimension 2 - data persistency 
+
+5. Dimension 4 - data consistency
+
+6. Future of SQL - NewSQL 
+
+7. Future of NoSQL - feature convergence, cloud computing
+
+8. Future of Hadoop, Cassandra, Hypertable
+
+-------------------------------------------------------------------------
+Краткие выводы предыдущей лекции
+--------------------------------
+
+Мы расмотрели концептуальную схему, внутреннее устройство СУБД.
+
+Мы рассмотрели  принципальную схему, устройство б-дерева.
+
+Мы  разобрали различные модели данных: ER, relational, object-relational,
+object-oriented, nosql: key/value, document-based, xml, json, graph
+
+Мы рассмотрели преимущества и недостатки различных моделей: 
+преимущества наличия схемы данных и её отсутствия.
+
+Мы познакомились с понятием агрегата, как основной сущности приложения, 
+определяющей границы транзакции.
+
+------------------------------------------------------------------------
+
+- Some boxes represent system components, double boxes are also in-memory
+  data structures
+
+- DML follows the path of the left side. DDL follows the path of the
+right side
+
+- transaction processing, two views:
+ - AI - concurrency control mechanisms, lock manager, scheduler, 
+ - CD - consistency, durability - logging and recovery manager
+
+acid  - coined in 1983 by andreas reuters
+
+atomicity - any transaction or completes, or rollbacks, no part
+of transaction is left of the system in case of rollback
+
+A typical example of atomicity failure is in accounting, money transfer:
+subtract from one account, add to another account.
+
+e.g.:
+ - one part of transaction fails - all fails
+ - type of failure: power failure, crash, resource allocation error, bug
+
+consistency - brings database from one valid state to another.
+In a relational valid is defined by constraitns, triggers, foreign keys
+ consistency is very general, so an example would based on a
+ consistency instrument implemented in the database. 
+
+isolation -  principle of serial history, even though the transactions
+may execute concurrently, it's possibe to come up with a serial order
+of execution for them. 
+
+
+T1 subtracts 10 from A.
+T1 adds 10 to B.
+T2 subtracts 10 from B.
+T2 adds 10 to A.
+
+ - wikipedia example
+
+durability - once a transaction is committed, it will remain in the database
+ - violation: power loss, machine failure, site failiure, bug
+
+ - success message is sent to the client - mongodb
+ -------------------------------------------------------------------------
+Entity-relationship data model
+------------------------------
+
+An entity is an object of some sort. It resembless a class in object
+-oriented programs.
+
+To disamgiguate individual objects and classes entity is distinguished
+from an entity set. 
+
+Attributes of an entity are either atomic, or structures, or containers.
+So, not everything is an object.
+
+Entity                Entity           Relationship
+Movies                Stars            Appears-in
+
+Multi-way relations can be converted to 1-to-many relations
+(conceptualy)
+
+Subcasses can be modelled with relation 'isa'
+
+Object-relational models, the principle of exposure
+---------------------------------------------------
+- create a relation for each entity  - key of the root,
+entity-specific attributes
+- create a relation for each entity - but store the root
+in the relation
+- use null values
+- representing compound attributes
+
+Issues:
+- it is expensive to answer queries involving several relations
+
+A query involving several relations, depending on decomposition, is either
+a) or b)
+
+NULL method:
+Adding members to objects -> rebuild entire relation
+Minimize space, avoid repetition
+
+How are objects usually represented in a reational database:
+-----------------------------------------------------------
+
+
+D can be exposed - i.e. considered not an atom.
+Exposure is a function of the application. An application changes,
+what used to be an atom, is exposed.
+
+Type is not its representation 
+
+Esposure is paramount, since existence of exposure either must
+impact the storage layout, or will severely impact performance.
+
+
+Object-oriented models
+----------------------
+
+- objects are persistent
+- they speak nothing about how objects map to relations, or,
+if they do, they choose some way of decomposition. 
+
+It's necessary to understand that what matter is not how
+an object maps to relation, but how object maps to an 
+underlying data structure, so that access and modification
+is economical.
+
+object concept #1 - an object has an identity independent on 
+its value - can it be ignored?
+
+exposure - in object system - adds an idenity
+
+
+- to conclude, an object model is:
+ a bit more flexible than relational model, since it makes
+ certain object operations transparent
+ yet it doesnot solve the principal problems of any object-reational,
+ or object-representation mapping:
+ - the problem of exposure
+ - the problem of perfect data decomposition
+type/class
+
+- compared to schema-less data model it still requires an in-advance
+schema definition
+
+relations are sets or bags or collections
+
+class Movie {
+    attribute string title;
+
+
+
+association: parent-child, uses
+
+aggregation, composition: Set, Bag, List
+
+Reference
+
+relationship Set<Star> stars inverse Star::StarredIn
+relationship Studio ownedBy inverse Studio::owns
+
+}
+inheritance
+
+Under the hood, if we presume there are b-trees, the implementation
+
+Semistructured data (XML)
+-------------------------
+
+root node
+
+every object is described by its path from the root.
+
+<star>
+</star>
+
+<movie>
+</movie>
+
+- data is self-describing - the schema is within
+the schema, however, is impossible to vaidate
+- a leap from information integration and small databases (lotus notes)
+to your-default-choice for a non-relational database
+
+well formed xml vs. valid xml - existence of schema
+
+Conclusion
+----------
+
+How to choose the right schema:
+
+- your pattern is key/value and will stay key/value: key/value
+- your aggregate unstructured data but you worry about data quality:
+XML or binary repr. of XML with schema
+- your aggregate unstructured data, but 
+
+- pure relational - you don't have any better
+- object-relational, or partially structured 
+- these indexes must be there, 
+------------------------------------------------------------------------------
+
+4. Многообразие моделей данных СУБД.
+
+Как мы помним из истории NoSQL, реляционная модель не возникла
+из ниоткуда - она представила прекрасный механизм
+отделения модели данных от представления данных, а также 
+дала возможжность выполнять Ad-hoc запросы к данным, в иделае
+лишь изменяя индексы, но не схему данных.
+
+Чего же эта модель не учитывала? 
+
+1. Необходимость в agile & schema change 
+
+2. Variety в 3V понятия Big Data - часто задача data capture
+стоит настолько остро, что паттерн ETL (extract-transform-load)
+заменяется паттерном LTE. 
+
+Тут надо понимать, что Big Data являетс ялишь одной из причин
+возникновения NoSQL, но не единственной
+
+3. Нишевые задачи, такие как работу над графом данных *c новыми
+показателями Performance и usabity* - т.е. Joe Celko 
+с его 5ю способами решать графовые задачи в реляционных базах
+не канает
+
+Мир существующих баз данных, таким образом, можно разделить на 
+следующие группы, по моделям данных:
+
+pre-nosql:
+
+- hierarchical - 60x
+- network  - 70x
+- relational 80x+ (column-oriented store, row-oriented store)
+- object databases - почему они не взлетели стоит отдельного анализа)
+90x+
+- xml databases 2000x+ (также умерли - в основном из-за
+слишком высокой сложности реализации и сравнительно низких 
+benefits, им на смену пришли более простые document store)
+
+nosql:
+
+- key-value store
+- column store (другой смысл! - BigTable columnar store != Vertica column
+  store, vertica is a relational database)
+- document database
+- graph database
+
+NoSQL системы также часто характеризуют как schema-less - это
+означает  что нет схемы распространяющиеся на все документы коллекции.
+
+Что же особенного в этих моделях данных?
+
+Во-первых, мы видим что они в разной мере приближены к модели
+реализации - relational наиболее абстрагированы, остальные наименее
+абстрагированы.
+
+Во-вторых, они в разной мере структурируют данные. В иерархических, 
+реляционных, сетевых базах данных данные высоко структурированы, минимальным
+атомом хранения является атом - строка, число и т.д.
+
+В-третьих, отношения с метаданными, то есть с информацией о структуре
+данных, выстроены в разной мере.
+В реляционных базах данных все строки должны удовлетворять схеме даннхы
+таблице.
+
+В XML базе данных строки должны следовать DTD - схеме XML данных, но DTD 
+однако позволяет документу иметь существенно большую свободу чем 
+relatioanl table row. Что важно, в XML DTD по-прежнему, как
+в реляционых системах, "извлечён" из документа, то есть общий для всех
+документов.
+
+В JSON/document stores каждый объект самоописан, и разные объекты
+могут иметь разные схемы, при этом храниться в одной коллекции.
+Каждый объект идентифицируется uuid.
+
+В key/value структура объекта вообще неизвестна - key maps to a blob
+and the database is value-agnostics, it stores what it gets.
+
+Таким образом мы наглядно видим что данные в разной мере структурированы -
+и это отражает проблематику, для решения которой СУБД создавались.
+
+Если на переднем плане стоит data capturing - данные минимально
+структурированы.
+
+Если на переднем плане стоит производительность работы с одним
+атомом данных - данные структурированы в соответствии с этим сценарием.
+
+Для аналитики и oltp естественным образом наилучшим образом подходят
+СУБД с высоким уровня "знания" о структуре перерабатываемых данных.
+
+Специализированные модели, такие как graph databases, подходят исключительно
+для специализированынх задач, таких как поиск кратчайшего пути в графе
+(например, база данных улиц в городе).
+
+Понятие агрегата
+----------------
+
+Попытки найти "идеальную модель" не останавливались с конца 60х годов.  Хотя
+модель Кодда идеально подходила для решения задач oltp, и извлечения знаний из
+фактов - relational table row is ideal for storing a single piece of factual
+data, to understand why - go learn prolog), наличие object-relational
+impedance mismatch, а также очевидная неприменимость реляционной модели 
+для решения всех существующих задач заставляли вести поиски "более идеальной
+модели".
+
+В настоящее время наиболее уместно сказать что "ложки нет" (с) Матрица
+- т.е. идеальной модели данных не существует в принципе. 
+Наиболее правильным подходом к пониманию структуры данных с которыми
+идёт работа является доменно-ориентированны анализ - то есть 
+опора на то, каким образом на данные смотрит предметная область,
+задачи автоматизации которой решает СУБД.
+
+Также не существует и "идеального представления" данных - в то
+время как доминирующей системой хранения реляционных таблиц ыли B-деревья,
+в зависимости от задач стоящих перед СУБД даже для хранения
+реляционных нормализованных данных более уместными могут быть совершенно
+разные алгоритмы, начиная COLA и заканчивая column store.
+Очевидно одно - для макс. производительности представление данных
+должно следовать или коррелировать с моделью данных, а также, для
+одних и тех же данных в зависимости не толкьо от модели но и от
+паттерна доступа (больше запись, больше чтение, больше аналитики, больше 
+oltp), уместно то или иное представление.
+
+Поэтому часто для понимание моделей данных вводится понятие "агрегата",
+то есть наиболее часто запрашиваемого/оперируемого "юнита" данных.
+
+Так, в OLTP системе обработки заказов customers - inventory - orders
+"агрегатом" будет являться заказ, в уютной ЖЖшечке - блог пост со всеми 
+комментами, в системе хранения профилей - регистрационные данные
+пользователя (фиксированный набор полей) *и* коллекция настроек профиля.
+
+Именно с точки зрения "агрегата" удобнее всего понимать модели
+данных NoSQL систем: 
+
+-  key - value - одна пара ключ-значение представляет собой агрегат
+База данных *ничего* не знает о структуре value
+
+- document store - документ - чаще всего в виде json, идентифицирован
+document id,  но внутрення структура документа открыта. 
+Схемы нет.
+
+Часто таким образом разница между key-value document размыта
+- key value эволиционируют в document store Со временем.
+
+- bigtable - key или key + column family 
+
+Действительно, ограничений схемы на этапе document-store, key-value 
+отсутствуют.
+
+Но что если мы хотим сделать запрос по вторичным ключам, то есть
+не по aggregate, чаще всего это либо невозможно (key-value), либо предполагает
+наличие хотя бы ad-hoc/implicit схемы - то есть в запросе участвуют только
+документы имеющие эти индексы. 
+
+Каков же механизм вычисления запросов по Ad-hoc/implicit схеме? Частичные
+индексы (документ участвует в индексе только если у него есть определённый
+путь типа user.address.city), либо map/reduce (hadoop/pig работает так).
+
+То есть в мире NoSQL мы платим полную цену за то, что не сообщаем базе 
+данных достаточно информации о схеме данных и паттернах доступа к данным.
+Однако это не являются "определяющей" характеристикой NoSQL - скорее
+это подтверждает наличие континуума моделей даннных.
+
+
+-----------------------------------------------------------------------
+5. Модели консистентности данных.
+
+Что такое консистентность?
+
+Для того, чтобы дать начальное рассмотрение моделям консистентности
+данных обратимся к C в ACID. C идёт рука об руку с durability, 
+и уходит корнями в понятие "последовательной истории". Т.е.
+консистентность - это в первую очередь непротиворечивая история
+событий при наличии глобальных часов. Удивительно каким образом
+здесь теория СУБД перекликается с общей теорией относительности:
+ложки нет.
+
+В распределённой система может иметь лишь частичное упорядочение, 
+и для того чтобы ввести глобальный порядок необходим обмен сообщениями.
+Поэтому, по сути, модели консистентности NoSQL систем - это различные
+наборы правил обмена сообщениями, дающие разную степень глобальной
+упорядоченности событий. 
+
+При этом надо понимать, что требование обмена сообщениями
+идёт вразрез как с требованием масштабируемости системы (если
+объём необходимого обмена зависит от числа узлов в кластере,
+то система не масштабируется линейно) так и стребованием 
+высокой доступности. Последнее было сформулировано Eric Brewer
+в его CAP conjecture. 
+
+Рассмотрим подробнее CAP conjecture Брюера.
+
+Не вдаваяс в детали, Брюер утверждает, что система, состоящая
+из узлов обменивающихся сообщениями, и обладающая такими 
+свойствами как консистентность С, доступность (availability) A
+и устойчивость к потере связи между узлами (partition tolerance),
+в случае именно этого события network partitioning имеет возможность
+сохранить лишь одно из свойств: C или A.
+
+В реальности, однако, всё гораздо сложнее чем описано у Брюера.
+Во-первых, "системой" в понимании Брюера является не СУБД 
+в целом, а узлы обменивающиеся сообщениями, и консистентная
+история очень часто состоит из непересекающихся эпизодов. СУБД может
+предпочитать A С в одной цепочке событий, и C A в другой. 
+
+Во вторых, если речь идёт о консистентности даже в пределах одного
+эпизода, то есть много видов потенциально возникающих аномалий,
+и решение о том, являются ли определённые виды неконсистентности
+допустимыми - это бизнес-решение.
+
+Два примера: резервация номера в гостинице и резервация авиаперелётов
+
+
+Наболее сильной моделью упорядоченности является serial history,
+из определения транзакционных систем. 
+
+Вторая размерность консистентности возникает в кластеризованных
+базах данных - и часто, ACID предлагаемый транзакционными
+баами overkill.
+
+Но давайте не сходить с ума по поводу Paxos или eventual consistency
+- мир репликации традиционных баз данных также предлагает 
+нам некотоыре модели консистентности.
+
+Поэтому можно ввести следующие классы моделей консистентности 
+(о как):
+
+gossip  - virtual synchrony - distributed state machines & quorum - 
+database transactions
+
+ACID = Atomicity, Consistency, Isolation,
+and Durability
+•  BASE = Basically Available, Soft state,
+Eventually consistent
+
+
+Каждый класс содержит десятки если не сотни протоколов, разные
+в деталях и в свойствах производительности, но имеющие общие
+для класса свойства в отношении предоставляемых гарантий.
+
+The power of gossip lies in the robust spread of information. Even
+if Dave had trouble understanding Bob, he will probably run into
+someone else soon and can learn the news that way.
+
+Тажке, не надо путать распределённые транзакции и консистентную репликацию 
+- в репликации *транзакция всегда происходит на одном узле*, 
+в распределённых транзакциях равноправные участники - несколько узлов
+
+Таким образом master-master != paxos, paxos is an overkill 
+unless you're agreeing on the consensus at what your cluster is.
+
+Зачем нужно вычислять консенсус в кластере? 
+
+Пример для консистентности - резервирование в авиалиний.
+
+Вам приходило в голову почему есть понятие резервирование? Почему иногда
+резервирование не проходит? И почему иногда случается так, что даже 
+при наличии билета места на самолёте не находится и вас сажают в
+бизнес-класс либо сажают на другой самолёт?
+
+Об юните консистентности
+------------------------
+Graph databases are most of the time ACID and single-machine (vertically
+scalable, not horizontally scalable).
+Reason: very detailed, very low-level. So in a graph database you
+typically change *many* atoms at once, so you need acid to keep
+these changes atomically.
+
+Aggregates are a hint for ACID too, since if your data is
+not normalized, what yu previosuly had to do with a multi-statemnt
+transaction now you can do by rreplacing an entire aggregate.
+
+Aggregates also reflect the workflow in an online system -
+you display the curren state of the document, and let 
+the document be updated later on. So you can't put it into 
+a single transaction. 
+
+
+Strict Consistency according to Lipcon means that “All read operations must
+return data from the latest completed write operation, regardless of which
+replica the operations went to”. This implies that either read and write
+operations for a given dataset have to be executed on the same node2 or that
+strict consistency is assured by a distributed transaction protocol (like
+two-phase-commit or Paxos).  As we have seen above, such a strict consistency
+cannot be achieved together with availability and partition tolerance
+according to the CAP-theorem.
+
+
+Eventual Consistency means that readers will see writes, as time goes on: “In
+a steady state, the system will eventually return the last written value”.
+Clients therefore may face an inconsistent state of data as updates are in
+progress. For instance, in a replicated database updates may go to one node
+which replicates the latest version to all other nodes that contain a replica
+of the modified dataset so that the replica nodes eventually will have the
+latest version.  Lipcon and Ho point out that an eventually consistent system
+may provide more differentiated, additional guarantees to its clients (cf.
+[Lip09, slide 16], [Ho09a]):
+
+
+Read Your Own Writes (RYOW) Consistency signifies that a client sees his
+updates immediately after they have been issued and completed, regardless if
+he wrote to one server and in the following reads from different servers.
+Updates by other clients are not visible to him instantly.
+
+Session Consistency means read your own writes consistency which is limited
+to a session scope (usually bound to one server), so a client sees his
+updates immediately only if read requests after an update are issued in the
+same session scope.
+
+Casual Consistency expresses that if one client reads version x and
+subsequently writes version y, any client reading version y will also see
+version x.
+
+
+Monotonic Read Consistency provides the time monotonicity guarantee that
+clients will only see more updated versions of the data in future requests.
+
+3 История NoSQL движения
+
+
+Way back in the 1960s databases didn’t separate data representation
+and data access.
+
+To navigate in an index, a database user had to know the physical
+structure of the index.
+
+Obvious deficiencies of the approach led to introduction of separation of
+data model and data representation. Relational model is one and still
+the most popular way to do it.
+
+One of the most well known deficiencies of a relational model is the
+so-called object-relational impedance mismatch: there is more than one way
+to map objects to relations, and none of them fits all access
+patterns well.
+
+It has as well a number of advantages: simplicity, ease of analytical
+processing, and, let’s not forget, performance: by normalizing data, a
+user is forced to tell the DBMS more about data constraints, distribution,
+future access patterns.
+
+This makes building efficient and to-the-point data representation
+structures easier.
+
+Unfortunately, the past generations of database management systems did not
+address one of the main architecture drawbacks, which plagues the relational
+model: rigidity of schema change. Very few mainstream DBMS allow to change
+the structure of a relational database quickly, without downtime or
+significant performance penalty. This is not a drawback of the relational
+model, but of one which relates to the implementation.
+Good luck consistently changing database schema in a cluster of databases.
+
+It should also be kept in mind that in many cases a relational model is an
+overkill, and a simple key to value mapping is sufficient.
+
+And of course no single model can fit all needs (e.g. graph databases build
+around the notion of nodes & edges, yet, good luck trying to quickly
+calculate CUBE on a bunch of nodes in a graph database).
+
+Unfortunately, the world of NoSQL, when it comes to the data model, often
+simply takes us back to the 60s: there is minimal abstraction of data access
+from data representation, and once a certain representation has been chosen,
+there is no way to change it without rewriting your application (e.g. to fit
+the new performance profile).
+
+Scalability is an answer, but a silly one: throwing more hardware at a
+problem is not always economical. 
+
+==========================================================================
+
+Термин NoSQL сформулировал Eric Evans из Rackspace.
+
+Google BigTable и Amazon Dynamo можно объективно назвать основателями
+NoSQL движения. Здесь достаточно рассмотреть use case на который они
+были рассчитаны.
+
+
+“Shard MySQL to handle high write loads, cache objects in memcached to handle
+high read
+loads, and then write a lot of glue code to make it all work together. That
+was state of the art,
+that was how it was done. The architecture of many major sites still
+follow[sic!] this pattern
+today, largely because with enough elbow grease, it works.” (cf. [Hof10c])
+
+-----------------------------------------------------------------------
+
+
+2. Размерность хранения данных 
+
+Проблема эффективного хранения и доступа к данным
+часто несправедливо остаётся за бортом рассмотрения NoSQL движения.
+
+Одним из факторов сдавания позиций реляционных систем является
+морально устаревшая алгоритмическая база для хранения данных.
+
+Большинство систем используют B-trees, для упорядоченного хранения
+данных, плюс один из вариантов ARIES семейства алгоритмов для
+управления версиями.
+
+Б-деревья как структура данных балансируют производительность
+вставок и производительность поиска, и при этом "приносят в жертву"
+производительность удаления. Этот баланс также неверен
+в типичном Web приложении, с динамично устаревающими данными.
+
+В последнее время широкое распостранение получили cache-oblivious
+algorithms, которые часто существенно лучше распараллеливаются
+в сравнении с традиционными B-trees, что также немаловажно.
+
+Давайте для примера рассмотрим cache-oblivious b-trees.
+
+Также, в области проблематики хранения находится организация
+обработки транзакций на одном узле. В зависимости от моделей данных
+различия в алгоритмы блокировок при обработке транзакций становятся
+немаловажными.
+
+Также давайте рассмотрим такую простую вещь как префиксная компрессия
+в б-дереве.
+
+Наксоклько она актуально для json /xml данных? Очень актуально.
+Насколько это актуально для нормализованных данных? ну разве что если тип
+данных - строка, причём немаленькая (json/xml :)
+Стоит ли заморачиваться с префиксной компрессией и MVCC? Алгоритм 
+становится непомерно сложным.
+
+Другим примером является блокировки при параллельном доступе к данным.
+Модель данных часто диктует реализацию а реализация, в свою очередь, 
+ограничиват пространство манёвра в области модели.
+
+Наиболее типичным объектом в документно-ориентированной модели
+является документ. Пусть средний размер документа 1 кб. Давайте попробуем
+конкрутентно и транзакционно обновить из 1000 потоков *разные*
+узлы по разным json paths. Мы получим стагнацию т.к. все 
+конкурентные обновления упрутся в блокировку на документе, т.к.
+документно-ориентированная база данных часто не расчитана на конкурентные
+обновления конкретных полей, а на перезапись всего документа. 
+
+
+Не стоит забывать также о такой базовой характеристике СУБД 
+как latency. С одной стороны, latency - физическая характеристика, 
+т.е. лежит на стороне реализации, но с другой стороны, каким образом
+обеспечить низкую latency в map/reduce запросе?
+
+Ну а в графовых СУБД без особенностей реализации и модель становется
+ненужной и излишней - все графовые операции можно выразить на языке SQL,
+то есть в графовых СУБД *реализация* является исходной посылкой
+для создания специфичной модели данных.
+
+Все эти примеры демонстрируют что с одной стороны, варианты
+реализации образует дополнительную размерность в области СУБД 
+решений, а с другой стороны показывает что пространство решений
+не может быть непрерывно, и имеет "точки максимума" вокруг потребностей
+рынка и возможностей реализации.
+
+
+
+Slide 1.
+-------
+
+There is a new embedded library coming out every week.
+A web engineer is tired of brands. Which one is faster?
+
+tokyoCabinet    tokytyrant      bitcask     leveldb 
+            sophia      tokudb          innodb      pbxt
+postgresql      HamsterDB       LightningDB   BerkeleyDB 
+                        BitCask
+
+Even though the source code is available, sheer
+number of engines makes the choice of an engine very
+difficult.  The only solution available is to try one out.
+Indeed, ther was a mamba.ru talk at nastachku.ru 2013 called
+
+> Практические вопросы использования в нагруженном проекте.
+
+What this talk basically did was to present a number of
+open source libraries in the light of a single practical task.
+It turned out that LevelDB was the best for this particular
+task. 
+Does it mean it's going to be best for your tasks? No.
+Of course the strategy of trying things out is a "safe" 
+one, since the benchmark you construct yourself is likely going
+to better reflect your production load than any benchmark out
+there you can look at.
+
+But your production load may change - and in fact very likely will
+if your project is successful. More data, or different data access
+patterns, etc.
+    
+For the sake of your safe choice, and also for the sake of knowing
+the large world around us I've come up with this talk. 
+
+It's a pity even though in most cases you *can* look at what's
+inside you can't *understand* what you see. And this is not
+because you don't know the programming language the code is
+written in.
+
+
+Slide 2
+-------
+
+Let's begin with a simple B-tree.
+
+Why B-tree is used at all?
+M-B-N - our input data. M is amount of RAM you have B is block size
+on disk, N is the number of elemnts you want to store. 
+
+This is why B tree is called B tree, Because B - is block size,
+each leaf in a B tree has size of a Block.
+
+Insert = log B (N), deletion = log B (N), lookup = log B (N)
+
+The good thing about B-tree is that it gives an algorithmical
+bound on the cost of each operation. But this bound
+is calculated under a few assumptions, which were true 
+in 60s, but no longer true:
+
+- size of row is less than block size
+- amount of memory is way smaller than the N 
+
+- most importantly, that memory is flat and disk is flat
+- cost of access to any piece in memory is equal, and cost
+of access of any block on disk is equal 
+
+So the entire cost model in which B-tree shines does
+not reflect the modern hardware.
+----------------------------------------------------------
+The other issue with B-trees which was not relevant before
+is variety in access. Any data structure must balance
+between:
+- data ingestion speed (took 20 minutes to insert data
+but 10 days to build indexes)
+- data access speed (table w/o indexes -> slow select speed).
+- freshness of data (you can build indexes after you insert
+data, or maintain them on the fly)
+
+Looks like B-trees are pretty balanced? The cost
+of insert is O(log B(N)), select and delete are the same.
+
+But what about: 
+- insert vs. select rate - 80/20 - can we find a better
+data structure for that? 
+- bulk operations - range scans, data loads, deletes,
+- data locality: most recent data is accessed first
+---------------------------------------------------------
+Slide 2: The idea of cache-oblivious algorithms
+
+Mentioned in the first slide, modern hardware has
+layers of memory: on-chip L1/L2 caches, NUMA is
+non-*uniform* memory architecture, disk controller cache
+is built around caching a few *tracks*, whatever they 
+happen to contain.
+
+The block transfer model has never been an ideal due
+to internal fragmentation, but at least it reflected
+reality of rotating disks, whereas there is no such
+thing as BLOCK in SSD storage - access cost is flat.
+
+So a new cost model for algorithms is necessary.
+
+Since there are so many layers of caches, it's
+necessary to find a model that does not depend
+on any one cache size in particular, but
+efficiently utilizes all caches. Sometimes
+it is achieved by making a single piece of 
+data the algorithm operates with << smaller than
+the cache size, sometimes, on the opposite, >> than
+the cache size.
+
+Then the complexity of the algorithm (cost model) can be expressed
+simply as a function of data set size N and cache miss count
+proportional to N it incurs (this is in turn a function of cache
+size, but algorithm cost estimate formula doesn't change with
+change of size of the cache).
+It's hard and not always possible. But
+this is what cache-oblivious algorithms are about.
+
+oblivious - lacking awareness of.
+
+Let's consider a most basic example of cache-oblivious
+algorithm using a cache-oblivious matrix  transposition.
+
+A more interesting example - matrix multiplication:
+
+It is based on block-multiplication formula for matrices A and B,
+resulting matrix C, the matrices are all square of size n:
+
+
+BLOCK - MULT ( A, B, C, n)
+1 for i = 1 to n/s
+2   do for j = 1 to n/s
+3     do for k = 1 to n/s
+4       do ORDINRARY- MULT (Aik , Bkj , Cij , s)
+
+s - denotes the size of the block 
+
+As can be seen from these two examples, most cache-oblivious
+algorithms are built on divide-and-conquer principle, and 
+thus can be parallelized well (compare with insertion-sort,
+for example, good luck making it parallel).
+
+Pictures: matrix trasnposition and multiplication
+------------------------------------------------
+
+Slide 3
+-------
+
+The iog structured merge trees.
+------------------------------------
+
+Log structures merge trees were described
+in 1996 paper, (O'Neil & others), before the
+concept of cache-oblivious data structures was introduced by
+Prokop in 1999, but to a large extent repeat
+ideas of Prokop.
+
+The basic idea is that instead of a single
+tree, you get a set of cascading ordered data structures, 
+with "merge trains" running between them: whenever
+a level 0 structure becomes full, it's emptied to
+level 1, and whenever level 1 becomes full, it is emptied
+into level 2.
+
+Since each level is never modified, only inserted
+into or merged with the previous level, it's not
+possible to physically delete data from an LSM 
+tree - so deletes instead are represented by
+tombstone records, take space, and deleted records
+simply merge down the levels until they reach
+the last level, in which they are finally pruned
+away.
+
+Note, LSM tree is not yet cache-oblivius: you do get
+to set the sizes of levels, according to your hardware and
+load, but it already is block-less.
+
+What are the advantages of the LSM tree?
+----------------------------------------
+
+- it favours accesses to the last inserted data
+- it doesn't have internal fragmentation, since
+it doesn't use small (4k-8k) blocks of B-trees
+- it is often made append-only, which is a nice
+property if you also need MVCC
+- perhaps part of general write-over-read
+friendliness, but worth noting separately 
+that it is batch deletes/inserts/etc friendly
+
+What are the disadvantages: 
+---------------------------
+- basically, insert cost is traded for select cost.
+The select has to look up in a series of cascading
+trees instead of just one trees. Modern LSM 
+tree implementations use Bloom-filters and other
+techniques to mitigate that. It is thus not
+very friendly for update-like workloads.
+
+- although they remove internal fragmentation of Block-
+oriented storage, the structure introduce write amplification. The
+size of your on-disk tree is up to 2x of your data set size, plus,
+on average, each record is written to every level 
+This is often mitigated by compression in advanced 
+storages.
+
+- range scans are also harder, since
+ you got to look through many trees instead of one.
+
+- there is an "overflow cascade" problem,
+which, if not addressed, can make a single
+insert cost very high. If not addressed, this
+may render this algorithm unusable (as we will
+see later, it is a problem of all cascading data structures,
+cache-oblivious a well).
+
+Slide 4
+-------
+
+LevelDB as one example of a cascading tree
+implementation.
+
+4M block size. Each block (called memtable
+in memory and sorted string table on disk)
+contains changes for a range of keys.
+The memtable is sorted, but is represented
+by a log file on disk. 
+
+Level 0 is called "young" files. there
+can be up to 4 young files on the level.
+Young level files naturally have
+overlapping ranges. lover levels dont'
+have overlapping ranges.
+
+Each level therefore is a collection of 4M
+blocks. Or, alternatively, block size
+can be set to grow with level. Each level
+is ~10x larger than the prvious one.
+So LevelDB "amortizes" merges between
+layers since it only merges the modified
+blocks from the previous level.
+
+The merge for level-1+ only takes
+one file from the previous level and
+pushes it to the next level, merging
+with (possible multiple) files on the next level.
+
+Compactions for a particular level rotate through the key space.
+In more detail, for each level L, we remember the ending key of
+the last compaction at level L. The next compaction for level L
+will pick the first file that starts after this key (wrapping
+around to the beginning of the key space if there is no such
+file). 
+
+To skip level look ups it uses a bloom filter
+associated with each file.
+
+LevelDB is doing almost nothing to amortize cascading merges
+(well, except that 2M range segregation that is built-into the
+frame of the algorithm), so it's performance is unstable.
+
+Picture: leveldb  insert latency
+Picture: leveldb illustration
+
+Check out HyperLevelDB, a patched leveldb
+used in hypertable and a few other projects.
+
+Facebook is doing leveldb++ - ask Mark Callaghan
+about it, he's around here.
+
+Slide 5
+-------
+
+Cache oblivious lookahead arrays
+--------------------------------
+
+Cache oblivious lookahead arrays were developed
+in MIT in 2000x and were first implemented
+in the closed-source, patented storate engine
+for MySQL, TokuDB. Right now this storage engine
+is also a possible MongoDB backend, and the
+technology became open source in 2013.
+
+The algorithms were jointly created by Kuzmaul, Colton & et al.
+
+The basic idea is that instead of a cascading
+set of B-trees, you get a cascade of sorted 
+arrays.
+
+Show pictures of how it is done.
+
+The insert cost into this data structure
+is O (lg(N)/B) - which is way less than
+O(logB(N)).
+
+To best understand cascading of these data
+structures imagine a binary representation
+of an integer, where each bit represents
+a level in a cascade:
+
+0
+1
+01
+11
+001
+101
+011
+111
+0001
+
+ - it can be shown that each addition
+flips on average no more than 1 + o(bit count)
+bits - this is what makes these trees so efficient.
+
+But this is on average, in practice there is
+the same cascading merge issue as in lsm 
+trees, so amortized algorithms must be used 
+to reduce spikes in latency. 
+
+Picture - insert into COLA
+
+Part 2
+------
+
+Simple popular SELECT-friendy storage algorithms
+------------------------------------------------
+
+We have discussed cache oblivious algorithms and
+LSM trees, and discovered that they have two major
+problems, which make them hard to implement (and
+hence no good open source immplementations are available):
+
+- insert latency can vary drastically unless
+inserts are amortized - not good for web app
+
+- select speed is preferred for insert speed
+ - also not good for a very large number of web apps.
+
+Important to distinguish simple key-value stores
+and relational database with secondary keys.
+
+With relational databases with secondary keys
+insert cost can be prohibitive if there are 
+a lot of B-tree or other type secondary keys, 
+thus an index is not created, unless LSM
+or COLA can be used for it. But with key-value
+you only have a primary key, so the argument
+of being able to maintain more indexes is not relevant.
+
+Strangely enough, most key-value stores (cassandra,
+hadoop, BigTable) use LSM and actually struggle with it.
+
+Of course, the apps with 80/20 insert/select ratio
+these structures are by far unbeatable (and in fact
+are assymptotically optimal, alghough seriously
+this is academic bullshit since assymptotically 
+unoptimal structures can be made to work faster
+in practice than assymptotically optimal ones).
+
+Now let's take a look at exactly such structures.
+
+Slide 6
+-------
+
+Bitcask
+
+Bitcask simply has a full key cache and 
+in each slot in the cache stores an offset to a
+value on disk. The cache is represented as a hash
+table, so no range scans. The hash
+indexes thus an append-only file.
+The append-only file is compacted over time
+by a separate process.
+
+This assumes that your RAM is infinite -
+which is in practice not true, but !
+
+In many cases RAM being 1/10 or 1/5
+of the data set is very real and very practical,
+thus making the cost estiamations irrelevant.
+
+It is an example, showing  that it's important to
+always keep in mind when comparing various data
+structures - what are the values of *your* M, N and B?
+
+Slide 7
+-------
+
+lmdb
+
+I have no fucking clue what this is but
+it is known because it'a part of openLdap.
+
+Make a reverence to it to provide a good
+intro to Sophia.
+
+Slide 8
+-------
+
+Sophia
+
+DESIGN
+
+Sophia's architecture combines a region in-memory index with a
+in-memory key index.
+
+A region index is represented as an ordered range of regions with
+their min and max keys and a latest on-disk reference. Regions
+never overlap.
+
+These regions have the same semantical meaning as the B-Tree
+pages, but are designed differently. They do not have a tree
+structure or any internal page-to-page relationships and thus no
+meta-data overhead (specifically to append-only B-Tree).
+
+A single region on-disk holds keys with values. And as a B-tree
+page, region has it's maximum key count. Regions are uniquely
+identified by region id number, by which they can be tracked in
+future.
+
+A key index is very similar to LSM zero-level (memtable), but has
+a different key lifecycle. All modifications first get into the
+index and hold until they will be explicitly removed by merger.
+
+The database update lifecycle is organized in terms of epochs.
+Epoch lifetime is determined in terms of key updates. When the
+update counter reaches an epoch's watermark number then the
+Rotation event happen.
+
+Each epoch, depending to its state, is associated with a single
+log file or database file. 
+
+Before getting added to the in-memory index, modifications are
+first written to the epoch's write-ahead log.
+
+On each rotation event:
+
+a. current epoch, which is called 'live', is marked as 'transfer'
+  and a new 'live' epoch is created (new log file)
+b. create new and swap current in-memory key index
+c. merger thread is being woken up
+
+The merger thread is the core part that is responsible for region
+merging and garbage collecting of a old regions and older epochs.
+On wakeup, the merger thread iterates through list of epochs
+marked as 'transfer' and starts the merge procedure.
+
+The merge procedure has the following steps:
+
+1. create new database file for the latest 'transfer' epoch
+2. fetch any keys from the in-memory index that associated with a single
+destination region
+3. for each fetched key and origin region start the merge and write a new
+region to the database file
+4. on each completed region (current merged key count is less or equal to
+max region key count):
+a. allocate new split region for region index, set min and max
+b. first region always has id of origin destination region
+c. link region and schedule for future commit
+5. on origin region update complete:
+a. update destination region index file reference to the current epoch
+and insert split regions
+b. remove keys from key index
+6. start step (2) until there is no updates left
+7. start garbage collector
+8. database synced with disk and if everything went well, remove all
+'transfer' epochs (log files) and gc'ed databases
+9. free index
+
+Design of garbage collector
+
+All that is needed is to track an epoch's total region count and a
+count of transfered regions during merge procedure. Thus, if some
+older epoch database has fewer than 70% (or any other changeable
+factor) live regions they just get copied to current epoch
+database file and the old one is being deleted.
+
+On database recovery, Sophia tracks and builds an index of pages from the
+youngest epochs (biggest numbers) down to the oldest. Log files are being
+replayed and epochs are marked as 'transfer'.
+
+Sophia has been evaluated as having the following complexity (in terms of
+disk accesses):
+
+set: worst case is a O(1) append-only key write + in-memory index insert
+
+get: worst case is a O(1) random region read, which itself do amortized O(log
+region_size) key compares + in-memory key index search + in-memory region
+search
+
+range: range queries are very fast due to the fact that each iteration needs
+to compare no more that two keys without search them, and access through
+mmaped database. Roughly complexity can be equally evaluated as having to
+sequentially read a mmaped file. 
+
+
+Conclusion
+----------
+
+A data structure is always a trade-off between:
+- data freshness
+- speed of insert
+- spead of look up
+
+On top of that, your access patterns make a difference!
+And your actual M, N and B too.
+
+So choose your engine wisely.
+
+
+Links
+-----
+
+Bitcask A Log-Structured Hash Table for Fast Key/Value Data
+Justin Sheehy David Smith with inspiration from Eric Brewer
+
+The Log-Structured Merge-Tree (LSM-Tree) Patrick O'Neil , Edward Cheng
+Dieter Gawlick, Elizabeth O'Neil
+
+Cache-Oblivious Algorithms by Harald Prokop (Master theses)
+
+Space/time trade-offs in hash coding with allowable errors, Burton
+H. Bloom
+
+Data Structures and Algorithms for Big Databases
+Michael A. Bender Stony Brook & Tokutek Bradley C. Kuszmaul
+(XLDB tutorial)
+
+sphia.org
+
+http://codecapsule.com/2012/12/30/implementing-a-key-value-store-part-3-comparative-analysis-of-the-architectures-of-kyoto-cabinet-and-leveldb/
+
+http://stackoverflow.com/questions/6079890/cache-oblivious-lookahead-array
+
+http://www.youtube.com/watch?v=88NaRUdoWZM
+(Tim Callaghan: Fractal Tree indexes)
+
+http://code.google.com/p/leveldb/downloads/list
+--------------------------------------------------------------------------
+Once you decide to scale out, the mesmerizing world of Distributed Systems
+comes into play. And for entering this arena, first you need to know CAP
+theorem and its implications. There is a very good formal proof by Nancy Lynch
+and Seth Gilbert, for the CAP theorem:
+Brewer's conjecture and the feasibility of consistent, available,
+partition-tolerant web services
+But if you want a really simple introduction to CAP theorem, then you can read
+this blog post. I liked it for its simplicity.
+A plain English introduction to CAP theorem " Kaushik Sathupadi
+Once you enter the arena, read the following research papers:
+(a) Dynamo - amazon's highly available key-value store(by Avinash Lakshman et.
+al from Amazon)
+Dynamo paper is the seminal paper in the field
+(b) Bigtable: a distributed storage system for structured data(by Jeff Dean
+and Sanjay Ghemawat from Google)
+Google's NoSQL system for their internal requirements
+(c) Cassandra: a decentralized structured storage system(by Avinash Lakshman
+and Prashant Malik from Facebook)
+
+Способы масштабирования СУБД
+
+Shard-memory, shared disk, shared nothing - история терминов.
+
+Вертикальное масштабирование.
+
+Проблемы вертикального масштабирования - общий доступ к данным.
+При этом было множество вертикально масштабируемых систем
+
+Master-slave репликация. Проблемы мастер-слейв репликации.
+Read-scaling. 
+
+Master-master репликация. Проблемы мастер-мастер репликации.
+Что такое виртуальная синхронность.
+
+Добро пожаловать в мир распределённых вычислений!
+
+Eight fallacies of distributed computing (cf. [Gos07]2 :
+“Essentially everyone, when they first build a distributed application,
+makes the following eight
+assumptions. All prove to be false in the long run and all cause big trouble
+and painful learning
+experiences.
+1. The network is reliable
+2. Latency is zero
+3. Bandwidth is infinite
+4. The network is secure
+5. Topology doesn’t change
+6. There is one administrator
+7. Transport cost is zero
+8. The network is homogeneous”
+
+Проблема консистентности распределённых ДКА:
+- двухфазный коммит.
+- паксос и рафт
+- CAP теорема
+- Eventual consistency И другие модели консистентности (
+  read your writes availability)
+- time and clock in a distributed system
+
+Горизонтальное масштабирование - шардинг.
+
+http://en.wikipedia.org/wiki/Virtual_synchrony
+https://github.com/couchbaselabs/TouchDB-iOS/wiki/Replication-Algorithm
